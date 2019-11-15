@@ -1,3 +1,7 @@
+.cproject
+.project
+.settings/
+.vscode/*
 *.o
 *.exe
 .DS_Store
@@ -28,3 +32,5 @@ addons/PhysiBoSS/MaBoSS-env-2.0/
 addons/PhysiBoSS/libMaBoSS-*.tar.gz
 user_projects/*
 !user_projects/empty.txt
+
+addons/dFBA/ext/*
