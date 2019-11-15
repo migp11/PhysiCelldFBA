@@ -1,4 +1,6 @@
-
+.cproject
+.project
+.settings/
 *.o
 unit-test-conservation.exe
 Makefile-backup
