@@ -13,9 +13,9 @@
 #include <map>
 #include <vector>
 
-#include <coin/CoinPackedMatrix.hpp>
-#include <coin/CoinPackedVector.hpp>
-#include <coin/ClpSimplex.hpp>
+#include <coin-or/CoinPackedMatrix.hpp>
+#include <coin-or/CoinPackedVector.hpp>
+#include <coin-or/ClpSimplex.hpp>
 
 #include <sbml/SBMLTypes.h>
 #include <sbml/packages/fbc/common/FbcExtensionTypes.h>
