@@ -118,6 +118,10 @@ void create_cell_types( void )
 	cell_defaults.phenotype.secretion.uptake_rates[oxygen_idx] = 10;
 	cell_defaults.phenotype.secretion.saturation_densities[oxygen_idx] = 38;
 
+	std::string lactate_name = "lactate";
+	static int lactate_idx = microenvironment.find_density_index( lactate_name );
+	phenotype.secretion.saturation_densities[lactate_idx] = 0;
+
 	// set the default cell type to no phenotype updates
 	cell_defaults.functions.update_phenotype = NULL;
 	cell_defaults.functions.volume_update_function = update_cell;
@@ -166,41 +170,41 @@ void setup_tissue( void )
 }
 
 void update_cell(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double dt ){
-  /*
-  for(auto itr = PhysiFBA::exchange_flux_density_map.begin();
-      itr != PhysiFBA::exchange_flux_density_map.end(); itr++)
-    {
-      std::string exchange_id = itr->first;
-      std::string density_id = itr->second;
-      //pCell->physifba_model;
-  }
-  */
 
-  std::string density_name = "oxygen";
+  phenotype.secretion.set_all_secretion_to_zero();
+  phenotype.secretion.set_all_uptake_to_zero();
 
-  std::string oxygen_flux_id = PhysiFBA::exchange_flux_density_map[density_name];
-  std::string biomass_flux_id = PhysiFBA::exchange_flux_density_map["growth_rate"];
+  std::string oxygen_name = "oxygen";
+  std::string glucose_name = "glucose";
+  std::string lactate_name = "lactate";
+  
+  std::string oxygen_flux_id = PhysiFBA::exchange_flux_density_map[oxygen_name];
+  std::string glucose_flux_id = PhysiFBA::exchange_flux_density_map[glucose_name];
+  std::string lactate_flux_id = PhysiFBA::exchange_flux_density_map[lactate_name];
 
-  static int density_idx = microenvironment.find_density_index( density_name );
-  double density_value = pCell->nearest_density_vector()[density_idx];
-  std::cout << "oxygen around me (" << pCell->ID << ") is: " << density_value << std::endl;
+  static int oxygen_idx = microenvironment.find_density_index( oxygen_name );
+  static int glucose_idx = microenvironment.find_density_index( glucose_name );
+  static int lactate_idx = microenvironment.find_density_index( lactate_name );
+
+  double oxygen_density = pCell->nearest_density_vector()[oxygen_idx];
+  double glucose_density = pCell->nearest_density_vector()[glucose_idx]; // dived by voxel size?
+  double lactate_density = pCell->nearest_density_vector()[lactate_idx]; // dived by voxel size?
+  
   
   double O2_Km = parameters.doubles("oxygen_Km");
   double O2_Vmax = parameters.doubles("oxygen_Vmax");
-  
-  double flux_bound = -1 * ( O2_Vmax * density_value) / (density_value + O2_Km);
-  pCell->physifba_model.setReactionLowerBound(oxygen_flux_id, flux_bound);
+  double oxygen_flux_bound = -1 * ( O2_Vmax * oxygen_density) / (oxygen_density + O2_Km);
+  pCell->physifba_model.setReactionLowerBound(oxygen_flux_id, oxygen_flux_bound);
 
-/*
-  std::string ex_glc_id = "R_EX_glc__D_e";
-  density_name = PhysiFBA::exchange_flux_density_map[ex_glc_id];
-  density_idx = microenvironment.find_density_index(density_name);
-  density_value = pCell->nearest_density_vector()[density_idx];
+  double glc_Km = parameters.doubles("glucose_Km");
+  double glc_Vmax = parameters.doubles("glucose_Vmax");
+  double glucose_flux_bound = -1 * ( glc_Vmax * glucose_density) / (glucose_density + glc_Km);
+  pCell->physifba_model.setReactionLowerBound(glucose_flux_id, glucose_flux_bound);
 
-  double Glc_Km = 0.0001;
-  double Glc_Vmax = 10.;
-  double Glc_flux_bound = ( Glc_Vmax * density_value) / (density_value + Glc_Km);
-*/
+  double lac_Km = parameters.doubles("lactate_Km");
+  double lac_Vmax = parameters.doubles("lactate_Vmax");
+  double lactate_flux_bound = -1 * ( lac_Vmax * lactate_density) / (lactate_density + lac_Km);
+  pCell->physifba_model.setReactionLowerBound(lactate_flux_id, lactate_flux_bound);
 
 
   std::cout << "Running FBA for cell: " << pCell->ID << std::endl;
@@ -209,10 +213,31 @@ void update_cell(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double
   PhysiFBA_reaction* reaction = pCell->physifba_model.getReaction(oxygen_flux_id);
   double oxygen_flux = reaction->getFluxValue();
   std::cout << "Oxygen flux: " << oxygen_flux << std::endl;
+
+  reaction = pCell->physifba_model.getReaction(glucose_flux_id);
+  double glucose_flux = reaction->getFluxValue();
+  std::cout << "glucose flux: " << glucose_flux << std::endl;
+
+  reaction = pCell->physifba_model.getReaction(lactate_flux_id);
+  double lactate_flux = reaction->getFluxValue();
+  std::cout << "lactate flux: " << lactate_flux << std::endl;
+
   
-  PhysiFBA_reaction* biomass_reaction = pCell->physifba_model.getReaction( biomass_flux_id );
-  double growht_rate = biomass_reaction->getFluxValue();
-  std::cout << "Biomass flux: " << growht_rate << std::endl;
+  if ( oxygen_flux < 0)
+  	phenotype.secretion.uptake_rates[oxygen_idx] = abs(oxygen_flux / oxygen_density);
+
+  if ( glucose_flux < 0)
+  	phenotype.secretion.uptake_rates[glucose_idx] = abs(glucose_flux / glucose_density);
+	  
+
+  if ( lactate_flux < 0 )
+  	phenotype.secretion.uptake_rates[lactate_idx] = abs(lactate_flux / lactate_density);
+	  
+  else if ( lactate_flux > 0 )
+    phenotype.secretion.secretion_rates[lactate_idx] = abs(lactate_flux / lactate_density);
+  
+  
+
 
 /*
   phenotype.volume.fluid += dt * phenotype.volume.fluid_change_rate *
@@ -251,7 +276,7 @@ void setup_default_metabolic_model( void )
   PhysiFBA::exchange_flux_density_map["glucose"] = "R_E1";
   PhysiFBA::exchange_flux_density_map["lactate"] = "R_E2";
   PhysiFBA::exchange_flux_density_map["oxygen"] = "R_E3";
-  PhysiFBA::exchange_flux_density_map["growth_rate"] = "R_R4";
+  PhysiFBA::exchange_flux_density_map["energy"] = "R_R4";
 
 }
 
