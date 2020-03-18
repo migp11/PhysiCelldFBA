@@ -115,12 +115,18 @@ void create_cell_types( void )
 	// set oxygen uptake and secretion to zero
 	static int oxygen_idx = microenvironment.find_density_index( "oxygen" ); // 0
 	cell_defaults.phenotype.secretion.secretion_rates[oxygen_idx] = 0;
-	cell_defaults.phenotype.secretion.uptake_rates[oxygen_idx] = 10;
-	cell_defaults.phenotype.secretion.saturation_densities[oxygen_idx] = 38;
+	cell_defaults.phenotype.secretion.uptake_rates[oxygen_idx] = 0;
+	cell_defaults.phenotype.secretion.saturation_densities[oxygen_idx] = 0;
 
-	std::string lactate_name = "lactate";
-	static int lactate_idx = microenvironment.find_density_index( lactate_name );
-	phenotype.secretion.saturation_densities[lactate_idx] = 0;
+	static int glucose_idx = microenvironment.find_density_index( "glucose" );
+	cell_defaults.phenotype.secretion.secretion_rates[glucose_idx] = 0;
+	cell_defaults.phenotype.secretion.uptake_rates[glucose_idx] = 0;
+	cell_defaults.phenotype.secretion.saturation_densities[glucose_idx] = 0;
+	
+	static int lactate_idx = microenvironment.find_density_index( "lactate" );
+	cell_defaults.phenotype.secretion.secretion_rates[lactate_idx] = 0;
+	cell_defaults.phenotype.secretion.uptake_rates[lactate_idx] = 0;
+	cell_defaults.phenotype.secretion.saturation_densities[lactate_idx] = 0;
 
 	// set the default cell type to no phenotype updates
 	cell_defaults.functions.update_phenotype = NULL;
@@ -236,9 +242,6 @@ void update_cell(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double
   else if ( lactate_flux > 0 )
     phenotype.secretion.secretion_rates[lactate_idx] = abs(lactate_flux / lactate_density);
   
-  
-
-
 /*
   phenotype.volume.fluid += dt * phenotype.volume.fluid_change_rate *
   	( phenotype.volume.target_fluid_fraction * phenotype.volume.total - phenotype.volume.fluid );
