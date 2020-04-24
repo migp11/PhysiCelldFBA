@@ -6,8 +6,8 @@
  * M. Ponce-de-Leon, Barcelona Supercomputing Center
  */
 
-#ifndef __PhysiFBA_model_h__
-#define __PhysiFBA_model_h__
+#ifndef __FBA_model_h__
+#define __FBA_model_h__
 
 #include <iostream>
 #include <map>
@@ -20,13 +20,13 @@
 #include <sbml/SBMLTypes.h>
 #include <sbml/packages/fbc/common/FbcExtensionTypes.h>
 
-#include "PhysiFBA_metabolite.h"
-#include "PhysiFBA_reaction.h"
+#include "FBA_metabolite.h"
+#include "FBA_reaction.h"
 
 
-namespace PhysiFBA{
+namespace FBA{
 
-  class PhysiFBA_model
+  class FBA_model
   {
   private:
   		/** \brief Constraint-Based Model Class to perform FBA*/
@@ -34,13 +34,13 @@ namespace PhysiFBA{
   		std::string id;
 
   		/** \brief vector of reaction objects*/
-  		std::vector<PhysiFBA_metabolite*> metabolites;
+  		std::vector<FBA_metabolite*> metabolites;
 
   		/** \brief map between metabolites' ids and metabolites' references **/
   		std::map<std::string, int> metaboliteIndexer;
 
   		/** \brief vector of reaction objects*/
-  		std::vector<PhysiFBA_reaction*> reactions;
+  		std::vector<FBA_reaction*> reactions;
 
   		/** \brief map between reaction IDs and reaction references */
   		std::map< std::string, int> reactionsIndexer;
@@ -51,22 +51,22 @@ namespace PhysiFBA{
   	public:
 
   		/** \brief Constructor */
-  		PhysiFBA_model();
+  		FBA_model();
 
   		/** \brief Destructor */
-  		~PhysiFBA_model();
+  		~FBA_model();
 
   		/** \brief Check if there is a metaboltie with a given ID*/
   		bool hasMetabolite(std::string mId);
 
   		/** \brief Add new metabolite to the model*/
-  		void addMetabolite(PhysiFBA_metabolite* met);
+  		void addMetabolite(FBA_metabolite* met);
 
   		/** \brief Check if there is a reaction with a given ID*/
   		bool hasReaction(std::string rId);
 
   		/** \brief Add new reaction to the model*/
-  		void addReaction(PhysiFBA_reaction* rxn);
+  		void addReaction(FBA_reaction* rxn);
 
   		/** \brief Get the number of model reactions*/
   		const int getNumReactions();
@@ -81,19 +81,19 @@ namespace PhysiFBA{
   		const int getReactionIndex(std::string rId);
 
   		/** \brief a metabolite pointer using a string Id*/
-  		const PhysiFBA_metabolite* getMetabolite(std::string mId);
+  		const FBA_metabolite* getMetabolite(std::string mId);
 
   		/** \brief Get a reaction pointer using string ID*/
-  		PhysiFBA_reaction* getReaction(std::string rId);
+  		FBA_reaction* getReaction(std::string rId);
 
   		/** \brief Get a metabolite pointer using s string Id*/
-  		const std::vector<PhysiFBA_metabolite*> getListOfMetabolites() const;
+  		const std::vector<FBA_metabolite*> getListOfMetabolites() const;
 
   		/** \brief Get the ClpSimplex model */
   		const ClpSimplex* getLpModel() const;
 
   		/** \brief Get the list of reaction pointers*/
-  		const std::vector<PhysiFBA_reaction*> getListOfReactions() const;
+  		const std::vector<FBA_reaction*> getListOfReactions() const;
 
   		/** \brief Update the upper bound of a reactions*/
   		void setReactionUpperBound(std::string rId, float upperBound);
@@ -116,7 +116,7 @@ namespace PhysiFBA{
   };
 
   //extern void update_cell(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double dt );
-  extern PhysiFBA_model PhysiFBA_default_model;
+  extern FBA_model FBA_default_model;
   extern std::map<std::string, std::string> exchange_flux_density_map;
 
 };

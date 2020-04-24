@@ -75,7 +75,7 @@
 #include "./PhysiCell_cell_container.h"
 #include "./PhysiCell_constants.h"
 
-#include "../addons/PhysiFBA/PhysiFBA_model.h"
+#include "../addons/PhysiCelldFBA/FBA_model.h"
 
 using namespace BioFVM; 
 
@@ -162,9 +162,9 @@ class Cell : public Basic_Agent
 	Phenotype phenotype; 
 
 	/* ============================================== */
-        /* PhysiFBA */
-        PhysiFBA::PhysiFBA_model physifba_model;
-        /* ============================================== */
+	/* PhysiFBA */
+	FBA::FBA_model fba_model;
+	/* ============================================== */
 
 	
 	void update_motility_vector( double dt_ );

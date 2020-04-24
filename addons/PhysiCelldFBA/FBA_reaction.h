@@ -12,9 +12,9 @@
 #include <vector>
 #include <map>
 
-#include "PhysiFBA_metabolite.h"
+#include "FBA_metabolite.h"
 
-class PhysiFBA_reaction
+class FBA_reaction
 {
 	private:
 		std::string id;
@@ -25,12 +25,12 @@ class PhysiFBA_reaction
 		double objectiveCoefficient;
 		double fluxValue;
 
-		std::map<const PhysiFBA_metabolite*, double> metabolites;
-		std::map<std::string, const PhysiFBA_metabolite*> idMetaboliteMap;
+		std::map<const FBA_metabolite*, double> metabolites;
+		std::map<std::string, const FBA_metabolite*> idMetaboliteMap;
 
 	public:
-		PhysiFBA_reaction(std::string id);
-		~PhysiFBA_reaction();
+		FBA_reaction(std::string id);
+		~FBA_reaction();
 
 		const std::string& getId() const;
 
@@ -53,7 +53,7 @@ class PhysiFBA_reaction
 
 		bool reversible();
 		bool hasMetabolite(std::string mId);
-		void addMetabolite(const PhysiFBA_metabolite* met, double stoich);
+		void addMetabolite(const FBA_metabolite* met, double stoich);
 
 		std::vector<std::string> getReactants();
 		std::vector<std::string> getProducts();
@@ -61,7 +61,7 @@ class PhysiFBA_reaction
 
 		std::string getReactionString();
 
-		const std::map<const PhysiFBA_metabolite*, double>& getMetabolites() const;
+		const std::map<const FBA_metabolite*, double>& getMetabolites() const;
 };
 
 

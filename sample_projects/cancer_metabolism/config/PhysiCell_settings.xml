@@ -156,8 +156,8 @@
 	
 	<user_parameters>
 		<random_seed type="int" units="dimensionless">50</random_seed> 
-		
-        	<!-- PhysiFBA parameters --> 
+		<tumor_radius type="double" units="micron">50.0</tumor_radius>
+        <!-- PhysiFBA parameters --> 
         <sbml_model type="string" units="">./config/iSIM.xml</sbml_model>
 
 		<oxygen_Km type="double" units="mmol">20</oxygen_Km>
