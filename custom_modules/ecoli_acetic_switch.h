@@ -1,5 +1,3 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
 /*
 ###############################################################################
 # If you use PhysiCell in your project, please cite PhysiCell and the version #
@@ -66,136 +64,41 @@
 #                                                                             #
 ###############################################################################
 */
---> 
 
-<!--
-<user_details />
--->
+#include "../core/PhysiCell.h"
+#include "../modules/PhysiCell_standard_modules.h"
+#include "../addons/PhysiCelldFBA/FBA_model.h"
 
-<PhysiCell_settings version="devel-version">
-	<domain>
-		<x_min>-500</x_min>
-		<x_max>500</x_max>
-		<y_min>-500</y_min>
-		<y_max>500</y_max>
-		<z_min>-10</z_min>
-		<z_max>10</z_max>
-		<dx>20</dx>
-		<dy>20</dy>
-		<dz>20</dz>
-		<use_2D>true</use_2D>
-	</domain>
-	
-	<overall>
-		<max_time units="min">720</max_time> <!-- 12h * 60 min -->
-		<time_units>min</time_units>
-		<space_units>micron</space_units>
-		<dt_diffusion units="min">0.005</dt_diffusion>  <!-- 0.01 -->
-		<dt_mechanics units="min">0.05</dt_mechanics> <!-- 0.1 -->
-		<dt_phenotype units="min">3</dt_phenotype>  <!-- 6 min -->
-	</overall>
-	
-	<options>
-		<disable_automated_spring_adhesions>false</disable_automated_spring_adhesions>
-	</options>
+using namespace BioFVM;
+using namespace PhysiCell;
+using namespace FBA;
 
-	<parallel>
-		<omp_num_threads>8</omp_num_threads>
-	</parallel> 
-	
-	<save>
-		<folder>output</folder> <!-- use . for root --> 
 
-		<full_data>
-			<interval units="min">30</interval>
-			<enable>true</enable>
-		</full_data>
-		
-		<SVG>
-			<interval units="min">30</interval>
-			<enable>true</enable>
-		</SVG>
-		
-		<legacy_data>
-			<enable>false</enable>
-		</legacy_data>
-	</save>
-	
-	<microenvironment_setup>
-		<variable name="oxygen" units="mmHg" ID="0">
-			<physical_parameter_set>
-				<diffusion_coefficient units="micron^2/min">100000.0</diffusion_coefficient>
-				<decay_rate units="1/min">0.1</decay_rate>  
-			</physical_parameter_set>
-			<initial_condition units="mmHg">38.0</initial_condition>
-			<Dirichlet_boundary_condition units="mmHg" enabled="false">38.0</Dirichlet_boundary_condition>
-		</variable>
-		<variable name="glucose" units="pmol" ID="1">
-			<physical_parameter_set>
-			<!-- https://bionumbers.hms.harvard.edu/bionumber.aspx?id=104089&ver=7 --> 
-				<diffusion_coefficient units="micron^2/min">600.00</diffusion_coefficient> 
-				<decay_rate units="1/min">.1</decay_rate>  
-			</physical_parameter_set>
-			<initial_condition units="pmol">0.09</initial_condition>
-			<Dirichlet_boundary_condition units="pmol" enabled="false">0.09</Dirichlet_boundary_condition>
-			<!-- use this block to set Dirichlet boundary conditions on individual boundaries --> 
-			<!-- <Dirichlet_options>
-				<boundary_value ID="xmin" enabled="false">0</boundary_value>
-				<boundary_value ID="xmax" enabled="false">0</boundary_value>
-				<boundary_value ID="ymin" enabled="false">0</boundary_value>
-				<boundary_value ID="ymax" enabled="false">0</boundary_value>
-				<boundary_value ID="zmin" enabled="false">1</boundary_value>
-				<boundary_value ID="zmax" enabled="false">0</boundary_value>
-			</Dirichlet_options> -->
-		</variable>
-		<variable name="acetate" units="pmol" ID="2">
-			<physical_parameter_set>
-				<diffusion_coefficient units="micron^2/min">600.00</diffusion_coefficient>
-				<decay_rate units="1/min">.1</decay_rate>  
-			</physical_parameter_set>
-			<initial_condition units="pmol">0.0</initial_condition>
-			<Dirichlet_boundary_condition units="pmol" enabled="false">0.0</Dirichlet_boundary_condition>
-		</variable>
-		
-		<options>
-			<calculate_gradients>false</calculate_gradients>
-			<track_internalized_substrates_in_each_agent>false</track_internalized_substrates_in_each_agent>
-			<!-- not yet supported --> 
-			<initial_condition type="matlab" enabled="false">
-				<filename>./config/initial.mat</filename>
-			</initial_condition>
-			<!-- not yet supported --> 
-			<dirichlet_nodes type="matlab" enabled="false">
-				<filename>./config/dirichlet.mat</filename>
-			</dirichlet_nodes>
-		</options>
-		
-	</microenvironment_setup>	
-	
-	<user_parameters>
-		<random_seed type="int" units="dimensionless">50</random_seed> 
-		<colony_radius type="double" units="micron">50.0</tumor_radius>
-        <!-- PhysiFBA parameters --> 
-        <sbml_model type="string" units="">./config/Ecoli_core.xml</sbml_model>
+// any additional cell types (beyond cell_defaults)
 
-		<oxygen_Km type="double" units="mmol">20</oxygen_Km>
-		<oxygen_Vmax type="double" units="mmol/t">40</oxygen_Vmax>
-        
-		<!-- Km 4.0 mg/L  -->
-		<!-- Km 0.032 fg/Voxel  -->
-		<!-- Km 0.0001 fmol/Voxel -->
-       	<glucose_Km type="double" units="mmol">4.0</glucose_Km>
-		<!-- 11 fmol/fgDW -->
-        <glucose_Vmax type="double" units="fmol/fgDW">11</glucose_Vmax>
-        
-		<acetate_Km type="double" units="mmol">1</acetate_Km>
-        <acetate_Vmax type="double" units="mmol">1</acetate_Vmax>
-		
-		<!-- BNID:103904 -->
-		<dry_weight type="double" units="fg">280</dry_weight> 
-		<doubling_time type="double" units="min">40</doubling_time>
-		<cell_radius type="double" units="micron">0.26</cell_radius>
+extern Cell_Definition motile_cell;
 
-	</user_parameters>
-	
-</PhysiCell_settings>
+// custom cell phenotype functions could go here
+
+// setup functions to help us along
+
+void create_cell_types( void );
+void setup_tissue( void );
+
+// set up the BioFVM microenvironment
+void setup_microenvironment( void );
+
+
+// custom pathology coloring function
+
+std::vector<double> integrate_total_substrates( void );
+
+void anuclear_volume_model (Cell* pCell, Phenotype& phenotype, double dt);
+
+void setup_default_metabolic_model( void );
+
+void update_cell(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double dt );
+
+void metabolic_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt );
+
+std::vector<std::string> my_coloring_function( Cell* );
