@@ -111,6 +111,9 @@ void create_cell_types( void )
 	// add custom data 
 	cell_defaults.custom_data.add_variable( "oncoprotein" , "dimensionless", 1.0 ); 
 	
+	build_cell_definitions_maps(); 
+	display_cell_definitions( std::cout ); 
+	
 	return; 
 }
 
