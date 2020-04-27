@@ -96,7 +96,7 @@
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>1</omp_num_threads>
+		<omp_num_threads>48</omp_num_threads>
 	</parallel> 
 		
 	<save>
@@ -123,13 +123,12 @@
 				<diffusion_coefficient units="micron^2/min">100000.00</diffusion_coefficient>
 				<decay_rate units="1/min">.1</decay_rate>  
 			</physical_parameter_set>
-			<initial_condition units="mmHg">0.0</initial_condition>
-			<Dirichlet_boundary_condition units="mmHg" enabled="false">0.0</Dirichlet_boundary_condition>
+			<initial_condition units="mmHg">38.0</initial_condition>
+			<Dirichlet_boundary_condition units="mmHg" enabled="false">38.0</Dirichlet_boundary_condition>
 		</variable>
 		<variable name="glucose" units="pmol" ID="1">
 			<physical_parameter_set>
-				<!-- https://bionumbers.hms.harvard.edu/bionumber.aspx?id=104089&ver=7 -->
-				<diffusion_coefficient units="micron^2/min">600.00</diffusion_coefficient>  
+				<diffusion_coefficient units="micron^2/min">600.00</diffusion_coefficient> <!-- https://bionumbers.hms.harvard.edu/bionumber.aspx?id=104089&ver=7 --> 
 				<decay_rate units="1/min">.1</decay_rate>  
 			</physical_parameter_set>
 			<initial_condition units="pmol">0.09</initial_condition>
@@ -160,9 +159,9 @@
 	
 	<user_parameters>
 		<random_seed type="int" units="dimensionless">50</random_seed> 
-		<colony_radius type="double" units="micron">50.0</colony_radius>
-	        <!-- PhysiFBA parameters --> 
-	        <sbml_model type="string" units="">./config/Ecoli_core.xml</sbml_model>
+		<colony_radius type="double" units="micron">50.0</tumor_radius>
+        <!-- PhysiFBA parameters --> 
+        <sbml_model type="string" units="">./config/Ecoli_core.xml</sbml_model>
 
 		<oxygen_Km type="double" units="mmol">20</oxygen_Km>
 		<oxygen_Vmax type="double" units="mmol/t">40</oxygen_Vmax>
@@ -170,17 +169,18 @@
 		<!-- Km 4.0 mg/L  -->
 		<!-- Km 0.032 fg/Voxel  -->
 		<!-- Km 0.0001 fmol/Voxel -->
-		<glucose_Km type="double" units="mmol">4.0</glucose_Km>
+       	<glucose_Km type="double" units="mmol">4.0</glucose_Km>
 		<!-- 11 fmol/fgDW -->
-	        <glucose_Vmax type="double" units="fmol/fgDW">11</glucose_Vmax>
+        <glucose_Vmax type="double" units="fmol/fgDW">11</glucose_Vmax>
         
-		<acetate_Km type="double" units="mmol">1</acetate_Km>
-	        <acetate_Vmax type="double" units="mmol">1</acetate_Vmax>
+		<acetate_Km type="double" units="mmol">1</lactate_Km>
+        <acetate_Vmax type="double" units="mmol">1</lactate_Vmax>
 		
 		<!-- BNID:103904 -->
 		<dry_weight type="double" units="fg">280</dry_weight> 
 		<doubling_time type="double" units="min">40</doubling_time>
 		<cell_radius type="double" units="micron">0.26</cell_radius>
+
 	</user_parameters>
 	
 </PhysiCell_settings>
