@@ -284,7 +284,7 @@ PhysiCell_utilities.o: ./core/PhysiCell_utilities.cpp
 	$(COMPILE_COMMAND) -c ./core/PhysiCell_utilities.cpp
 
 PhysiCell_custom.o: ./core/PhysiCell_custom.cpp
-	$(COMPILE_COMMAND) -c ./core/PhysiCell_custom.cpp 
+	$(COMPILE_COMMAND) -c ./core/PhysiCell_custom.cpp
 	
 PhysiCell_constants.o: ./core/PhysiCell_constants.cpp
 	$(COMPILE_COMMAND) -c ./core/PhysiCell_constants.cpp 
@@ -385,7 +385,7 @@ data-cleanup:
 
 checkpoint: 
 	zip -r $$(date +%b_%d_%Y_%H%M).zip Makefile *.cpp *.h config/*.xml custom_modules/* 
-	
+
 zip:
 	zip -r latest.zip Makefile* *.cpp *.h BioFVM/* config/* core/* custom_modules/* matlab/* modules/* sample_projects/*
 	cp latest.zip $$(date +%b_%d_%Y_%H%M).zip

@@ -72,15 +72,14 @@
 #include <cmath>
 #include <omp.h>
 #include <fstream>
-#include <string>
 
 #include "./core/PhysiCell.h"
-#include "./modules/PhysiCell_standard_modules.h"
+#include "./modules/PhysiCell_standard_modules.h" 
 
-// Addon module
-#include "custom_modules/ecoli_acetic_switch.h"
+// put custom code modules here! 
 
-
+#include "./custom_modules/custom.h" 
+	
 using namespace BioFVM;
 using namespace PhysiCell;
 
@@ -101,12 +100,11 @@ int main( int argc, char* argv[] )
 	
 	// PNRG setup 
 	SeedRandom(); 
-
+	
 	// time setup 
 	std::string time_units = "min"; 
 
-
-	/* Microenvironment setup */
+	/* Microenvironment setup */ 
 	
 	setup_microenvironment(); // modify this in the custom code 
 	
@@ -119,12 +117,10 @@ int main( int argc, char* argv[] )
 	/* Users typically start modifying here. START USERMODS */ 
 	
 	create_cell_types();
+	
 	setup_tissue();
 
 	/* Users typically stop modifying here. END USERMODS */ 
-
-	std::cout << "Setting metabolic model" << std::endl;
-	setup_default_metabolic_model();
 	
 	// set MultiCellDS save options 
 
@@ -146,7 +142,7 @@ int main( int argc, char* argv[] )
 
 	// for simplicity, set a pathology coloring function 
 	
-	std::vector<std::string> (*cell_coloring_function)(Cell*) = my_coloring_function; 
+	std::vector<std::string> (*cell_coloring_function)(Cell*) = my_coloring_function;
 	
 	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
@@ -204,27 +200,21 @@ int main( int argc, char* argv[] )
 					PhysiCell_globals.SVG_output_index++; 
 					PhysiCell_globals.next_SVG_save_time  += PhysiCell_settings.SVG_save_interval;
 				}
-				
-				// std::cout << "Total substrates " << integrate_total_substrates() << std::endl; 
 			}
 
 			// update the microenvironment
-			// microenvironment.simulate_diffusion_decay( diffusion_dt );
+			microenvironment.simulate_diffusion_decay( diffusion_dt );
 			
 			// run PhysiCell 
 			((Cell_Container *)microenvironment.agent_container)->update_all_cells( PhysiCell_globals.current_time );
 			
 			/*
 			  Custom add-ons could potentially go here. 
-			*/
-			for(int n=0; n < all_cells->size(); n++)
-			  {
-			    PhysiCell::Cell* pCell = (*all_cells)[n];
-			    update_cell(pCell, pCell->phenotype, diffusion_dt);
-			  }
+			*/			
+			
 			PhysiCell_globals.current_time += diffusion_dt;
 		}
-		
+
 		if( PhysiCell_settings.enable_legacy_saves == true )
 		{			
 			log_output(PhysiCell_globals.current_time, PhysiCell_globals.full_output_index, microenvironment, report_file);
@@ -243,6 +233,7 @@ int main( int argc, char* argv[] )
 	
 	sprintf( filename , "%s/final.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
+
 	
 	// timer 
 	
