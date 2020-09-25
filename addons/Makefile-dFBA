@@ -62,7 +62,11 @@ all:
 
 # sample projects
 
+<<<<<<< HEAD
 cancer_metabolism:
+=======
+cancer-dFBA:
+>>>>>>> 5fb0001207b22eb032ece6ef408df8fb9f1df5b4
 	cp ./sample_projects/cancer_metabolism/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
 	cp ./sample_projects/cancer_metabolism/main_cancer_metabolism.cpp ./main.cpp
@@ -71,7 +75,11 @@ cancer_metabolism:
 	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml
 	cp ./sample_projects/cancer_metabolism/config/* ./config/
 
+<<<<<<< HEAD
 ecoli_acetic_switch:
+=======
+ecoli-dFBA:
+>>>>>>> 5fb0001207b22eb032ece6ef408df8fb9f1df5b4
 	cp ./sample_projects/ecoli_acetic_switch/custom_modules/* ./custom_modules/
 	touch main.cpp && cp main.cpp main-backup.cpp
 	cp ./sample_projects/ecoli_acetic_switch/main_ecoli_acetic_switch.cpp ./main.cpp

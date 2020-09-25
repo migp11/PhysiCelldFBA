@@ -464,11 +464,19 @@ Cell* Cell::divide( )
 	// child->set_phenotype( phenotype ); 
 	child->phenotype = phenotype; 
 
+<<<<<<< HEAD
 	/* ============================================== */
 	/* FBA model from PhysiCelldFBA */
 	child->fba_model = this->fba_model;
 	/* ============================================== */
 
+=======
+	//===============================================
+        /* FBA model from PhysiCelldFBA */
+	//===============================================
+        child->fba_model = this->fba_model;
+        //===============================================
+>>>>>>> 5fb0001207b22eb032ece6ef408df8fb9f1df5b4
 	
 	return child;
 }

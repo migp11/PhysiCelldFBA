@@ -1,5 +1,9 @@
 VERSION := $(shell grep . VERSION.txt | cut -f1 -d:)
+<<<<<<< HEAD
 PROGRAM_NAME := cancer_metabolism
+=======
+PROGRAM_NAME := ecoli-dfba
+>>>>>>> 5fb0001207b22eb032ece6ef408df8fb9f1df5b4
 
 CC := g++
 # CC := g++-mp-7 # typical macports compiler name
@@ -32,8 +36,13 @@ ARCH := native # best auto-tuning
 
 # For debugging with gdb just add: -g3 -ggdb -O3
 # -DCLP_BUILD is an additional flags to link againt clp
+<<<<<<< HEAD
 # CFLAGS := -march=$(ARCH) -ggdb -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11 -DCLP_BUILD
 CFLAGS := -march=$(ARCH) -ggdb -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11 -DCLP_BUILD
+=======
+# CFLAGS := -march=$(ARCH) -ggdb -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11
+CFLAGS := -march=$(ARCH)  -O3 -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11
+>>>>>>> 5fb0001207b22eb032ece6ef408df8fb9f1df5b4
 
 
 # Libraries need: SBML and coin-Clp
@@ -45,29 +54,45 @@ COMPILE_COMMAND := $(CC) $(CFLAGS)
 BioFVM_OBJECTS := BioFVM_vector.o BioFVM_mesh.o BioFVM_microenvironment.o BioFVM_solvers.o BioFVM_matlab.o \
 BioFVM_utilities.o BioFVM_basic_agent.o BioFVM_MultiCellDS.o BioFVM_agent_container.o
 
+<<<<<<< HEAD
 PhysiCell_core_OBJECTS := PhysiCell_phenotype.o PhysiCell_cell_container.o PhysiCell_standard_models.o PhysiCell_cell.o PhysiCell_custom.o PhysiCell_utilities.o
+=======
+PhysiCell_core_OBJECTS := PhysiCell_phenotype.o PhysiCell_cell_container.o PhysiCell_standard_models.o PhysiCell_cell.o PhysiCell_custom.o PhysiCell_utilities.o PhysiCell_constants.o
+>>>>>>> 5fb0001207b22eb032ece6ef408df8fb9f1df5b4
 
 PhysiCell_module_OBJECTS := PhysiCell_SVG.o PhysiCell_pathology.o PhysiCell_MultiCellDS.o PhysiCell_various_outputs.o \
 PhysiCell_pugixml.o PhysiCell_settings.o
 
+<<<<<<< HEAD
 FBA_addon_OBJECTS := FBA_metabolite.o FBA_reaction.o FBA_model.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
+=======
+# put your custom objects here (they should be in the custom_modules directory)
+FBA_addon_OBJECTS := FBA_metabolite.o FBA_reaction.o FBA_model.o
+>>>>>>> 5fb0001207b22eb032ece6ef408df8fb9f1df5b4
 PhysiCell_custom_module_OBJECTS := ecoli_acetic_switch.o
 
 pugixml_OBJECTS := pugixml.o
 
 PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS)
+<<<<<<< HEAD
 ALL_OBJECTS := $(PhysiCell_OBJECTS) $(FBA_addon_OBJECTS) $(PhysiCell_custom_module_OBJECTS)
 
+=======
+ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(FBA_addon_OBJECTS) 
+>>>>>>> 5fb0001207b22eb032ece6ef408df8fb9f1df5b4
 
 # compile the project
 
 all: main.cpp $(ALL_OBJECTS)
 	$(COMPILE_COMMAND) $(INC) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp $(LIBS)
 
+<<<<<<< HEAD
 
+=======
+>>>>>>> 5fb0001207b22eb032ece6ef408df8fb9f1df5b4
 # PhysiCell core components
 
 PhysiCell_phenotype.o: ./core/PhysiCell_phenotype.cpp
@@ -90,6 +115,12 @@ PhysiCell_utilities.o: ./core/PhysiCell_utilities.cpp
 
 PhysiCell_custom.o: ./core/PhysiCell_custom.cpp
 	$(COMPILE_COMMAND) -c ./core/PhysiCell_custom.cpp
+<<<<<<< HEAD
+=======
+	
+PhysiCell_constants.o: ./core/PhysiCell_constants.cpp
+	$(COMPILE_COMMAND) -c ./core/PhysiCell_constants.cpp 
+>>>>>>> 5fb0001207b22eb032ece6ef408df8fb9f1df5b4
 
 # BioFVM core components (needed by PhysiCell)
 
@@ -143,6 +174,10 @@ PhysiCell_pugixml.o: ./modules/PhysiCell_pugixml.cpp
 PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 	$(COMPILE_COMMAND) -c ./modules/PhysiCell_settings.cpp
 
+<<<<<<< HEAD
+=======
+# user-defined PhysiCell modules
+>>>>>>> 5fb0001207b22eb032ece6ef408df8fb9f1df5b4
 
 # PhysiCelldFBA addon modules
 
@@ -155,7 +190,11 @@ FBA_reaction.o: ./addons/PhysiCelldFBA/FBA_reaction.cpp
 FBA_metabolite.o: ./addons/PhysiCelldFBA/FBA_metabolite.cpp
 	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ./addons/PhysiCelldFBA/FBA_metabolite.cpp -o ./FBA_metabolite.o
 
+<<<<<<< HEAD
 # user-defined PhysiCell modules
+=======
+
+>>>>>>> 5fb0001207b22eb032ece6ef408df8fb9f1df5b4
 ecoli_acetic_switch.o: ./custom_modules/ecoli_acetic_switch.cpp
 	$(COMPILE_COMMAND) -c ./custom_modules/ecoli_acetic_switch.cpp
 
@@ -169,7 +208,11 @@ reset:
 	touch ./custom_modules/empty.txt
 	touch ALL_CITATIONS.txt
 	rm ALL_CITATIONS.txt
+<<<<<<< HEAD
 	cp ./config/PhysiCell_settings_default.xml ./config/PhysiCell_settings.xml
+=======
+	cp ./config/PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml
+>>>>>>> 5fb0001207b22eb032ece6ef408df8fb9f1df5b4
 	touch ./config/empty.txt
 
 clean:
@@ -185,6 +228,12 @@ data-cleanup:
 
 # archival
 
+<<<<<<< HEAD
+=======
+checkpoint: 
+	zip -r $$(date +%b_%d_%Y_%H%M).zip Makefile *.cpp *.h config/*.xml custom_modules/* 
+
+>>>>>>> 5fb0001207b22eb032ece6ef408df8fb9f1df5b4
 zip:
 	zip -r latest.zip Makefile* *.cpp *.h BioFVM/* config/* core/* custom_modules/* matlab/* modules/* sample_projects/*
 	cp latest.zip $$(date +%b_%d_%Y_%H%M).zip
