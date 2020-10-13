@@ -224,6 +224,7 @@ int main( int argc, char* argv[] )
 			/*
 			  Custom add-ons could potentially go here. 
 			*/
+			#pragma omp parallel for
 			for(int n=0; n < all_cells->size(); n++)
 			  {
 			    PhysiCell::Cell* pCell = (*all_cells)[n];
