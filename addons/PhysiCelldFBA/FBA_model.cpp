@@ -5,57 +5,57 @@
  *      Author: mponce
  */
 
-#include "PhysiFBA_model.h"
+#include "FBA_model.h"
 
 
-namespace PhysiFBA{
+namespace FBA{
 
   /* Default model used to initialize the initial cell */
-  PhysiFBA_model PhysiFBA_default_model;
+  FBA_model FBA_default_model;
   std::map<std::string, std::string> exchange_flux_density_map;
 
 
-  PhysiFBA_model::PhysiFBA_model()
+  FBA_model::FBA_model()
   {
         this->id = "None";
         this->lp_model = nullptr;
   }
 
-  PhysiFBA_model::~PhysiFBA_model() {
-    for(PhysiFBA_reaction* rxn: this->reactions)
+  FBA_model::~FBA_model() {
+    for(FBA_reaction* rxn: this->reactions)
          delete rxn;
 
-     for(PhysiFBA_metabolite* met: this->metabolites)
+     for(FBA_metabolite* met: this->metabolites)
          delete met;
 
      delete lp_model;
 
   }
 
-  const ClpSimplex* PhysiFBA_model::getLpModel() const
+  const ClpSimplex* FBA_model::getLpModel() const
   {
       return this->lp_model;
   }
 
-  const int PhysiFBA_model::getNumReactions()
+  const int FBA_model::getNumReactions()
   {
 
       return this->reactions.size();
   }
 
-  const int PhysiFBA_model::getNumMetabolites()
+  const int FBA_model::getNumMetabolites()
   {
       return this->metabolites.size();
   }
 
-  bool PhysiFBA_model::hasMetabolite(std::string mId)
+  bool FBA_model::hasMetabolite(std::string mId)
   {
       std::map<std::string, int>::iterator itr;
       itr = this->metaboliteIndexer.find(mId);
       return itr != this->metaboliteIndexer.end();
   }
 
-  void PhysiFBA_model::addMetabolite(PhysiFBA_metabolite* met)
+  void FBA_model::addMetabolite(FBA_metabolite* met)
   {
       if (!this->hasMetabolite( met->getId() ))
       {
@@ -65,7 +65,7 @@ namespace PhysiFBA{
 
   }
 
-  const PhysiFBA_metabolite* PhysiFBA_model::getMetabolite(std::string mId)
+  const FBA_metabolite* FBA_model::getMetabolite(std::string mId)
   {
       if (this->hasMetabolite(mId))
       {
@@ -75,12 +75,12 @@ namespace PhysiFBA{
       return nullptr;
   }
 
-  const std::vector<PhysiFBA_metabolite*> PhysiFBA_model::getListOfMetabolites() const
+  const std::vector<FBA_metabolite*> FBA_model::getListOfMetabolites() const
   {
       return this->metabolites;
   }
 
-  bool PhysiFBA_model::hasReaction(std::string rId)
+  bool FBA_model::hasReaction(std::string rId)
   {
       std::map<std::string, int>::iterator it;
       it = this->reactionsIndexer.find(rId);
@@ -88,20 +88,20 @@ namespace PhysiFBA{
       return it != this->reactionsIndexer.end();
   }
 
-  PhysiFBA_reaction* PhysiFBA_model::getReaction(std::string rId)
+  FBA_reaction* FBA_model::getReaction(std::string rId)
   {
       if (this->hasReaction(rId))
       {
           int idx = this->reactionsIndexer[rId];
-          PhysiFBA_reaction* rxn = this->reactions[idx];
+          FBA_reaction* rxn = this->reactions[idx];
           return rxn;
       }
       return nullptr;
   }
 
-  void PhysiFBA_model::setReactionUpperBound(std::string rId, float upperBound)
+  void FBA_model::setReactionUpperBound(std::string rId, float upperBound)
   {
-    PhysiFBA_reaction* rxn = this->getReaction(rId);
+    FBA_reaction* rxn = this->getReaction(rId);
     if (rxn)
       {
         rxn->setUpperBound(upperBound);
@@ -110,9 +110,9 @@ namespace PhysiFBA{
       }
 
   }
-  void PhysiFBA_model::setReactionLowerBound(std::string rId, float lowerBound)
+  void FBA_model::setReactionLowerBound(std::string rId, float lowerBound)
   {
-    PhysiFBA_reaction* rxn = this->getReaction(rId);
+    FBA_reaction* rxn = this->getReaction(rId);
     if (rxn)
       {
         rxn->setLowerBound(lowerBound);
@@ -122,7 +122,7 @@ namespace PhysiFBA{
 
   }
 
-  void PhysiFBA_model::addReaction(PhysiFBA_reaction* rxn)
+  void FBA_model::addReaction(FBA_reaction* rxn)
   {
       if (!this->hasReaction( rxn->getId() ))
       {
@@ -131,7 +131,7 @@ namespace PhysiFBA{
       }
   }
 
-  const int PhysiFBA_model::getReactionIndex(std::string rId)
+  const int FBA_model::getReactionIndex(std::string rId)
   {
       if (this->hasReaction(rId))
           return this->reactionsIndexer[rId];
@@ -140,15 +140,15 @@ namespace PhysiFBA{
   }
 
 
-  const std::vector<PhysiFBA_reaction*> PhysiFBA_model::getListOfReactions() const
+  const std::vector<FBA_reaction*> FBA_model::getListOfReactions() const
   {
       return this->reactions;
   }
 
-  std::vector<std::string> PhysiFBA_model::getListOfBoundaryReactionIds()
+  std::vector<std::string> FBA_model::getListOfBoundaryReactionIds()
   {
       std::vector<std::string> listOfBoundaryIds;
-      for(PhysiFBA_reaction* reaction: this->reactions)
+      for(FBA_reaction* reaction: this->reactions)
       {
           if (reaction->getNumberOfMetabolites() == 1)
           {
@@ -158,14 +158,14 @@ namespace PhysiFBA{
       return listOfBoundaryIds;
   }
 
-  void PhysiFBA_model::readSBMLModel(const char* sbmlFileName)
+  void FBA_model::readSBMLModel(const char* sbmlFileName)
   {
       libsbml::SBMLReader reader;
       libsbml::SBMLDocument* document = reader.readSBML(sbmlFileName);
       libsbml::Model* model = document->getModel();
 
       libsbml::ListOfSpecies* listOfSpecies = model->getListOfSpecies();
-      libsbml::ListOfReactions* listOfPhysiFBA_reactions = model->getListOfReactions();
+      libsbml::ListOfReactions* listOfFBA_reactions = model->getListOfReactions();
       libsbml::ListOfParameters* listOfParameters = model->getListOfParameters();
 
       this->id = model->getId();
@@ -177,16 +177,16 @@ namespace PhysiFBA{
           if ( species->getBoundaryCondition() )
               continue;
 
-          PhysiFBA_metabolite* metabolite = new PhysiFBA_metabolite(species->getId());
+          FBA_metabolite* metabolite = new FBA_metabolite(species->getId());
           metabolite->setName(species->getName());
           this->addMetabolite(metabolite);
       }
 
       for(unsigned int i = 0; i < model->getNumReactions(); i++)
       {
-          libsbml::Reaction* sbml_reaction = listOfPhysiFBA_reactions->get(i);
+          libsbml::Reaction* sbml_reaction = listOfFBA_reactions->get(i);
 
-          PhysiFBA_reaction* reaction = new PhysiFBA_reaction(sbml_reaction->getId());
+          FBA_reaction* reaction = new FBA_reaction(sbml_reaction->getId());
           reaction->setName(sbml_reaction->getName());
 
           libsbml::FbcReactionPlugin* rxnFbc = static_cast<libsbml::FbcReactionPlugin*> (sbml_reaction->getPlugin("fbc"));
@@ -209,15 +209,15 @@ namespace PhysiFBA{
 
               if ( !this->hasMetabolite(sbml_species->getSpecies()) )
               {
-                  PhysiFBA_metabolite* metabolite = new PhysiFBA_metabolite(sbml_species->getSpecies());
+                  FBA_metabolite* metabolite = new FBA_metabolite(sbml_species->getSpecies());
                   metabolite->setName(sbml_species->getName());
                   this->addMetabolite(metabolite);
               }
-              const PhysiFBA_metabolite* metabolite = this->getMetabolite(sbml_species->getSpecies());
+              const FBA_metabolite* metabolite = this->getMetabolite(sbml_species->getSpecies());
               if (metabolite != nullptr)
                   reaction->addMetabolite(metabolite, stoich_coef);
               else
-                  std::cout << "ERROR: PhysiFBA_metabolite " << sbml_species->getSpecies() << " not found" << std::endl;
+                  std::cout << "ERROR: FBA_metabolite " << sbml_species->getSpecies() << " not found" << std::endl;
           }
 
           int numProducts = sbml_reaction->getNumProducts();
@@ -228,15 +228,15 @@ namespace PhysiFBA{
 
               if ( !this->hasMetabolite(sbml_species->getSpecies()) )
               {
-                  PhysiFBA_metabolite* metabolite = new PhysiFBA_metabolite(sbml_species->getSpecies());
+                  FBA_metabolite* metabolite = new FBA_metabolite(sbml_species->getSpecies());
                   metabolite->setName(sbml_species->getName());
                   addMetabolite(metabolite);
               }
-              const PhysiFBA_metabolite* metabolite = this->getMetabolite(sbml_species->getSpecies());
+              const FBA_metabolite* metabolite = this->getMetabolite(sbml_species->getSpecies());
               if (metabolite != nullptr)
                   reaction->addMetabolite(metabolite, stoich_coef);
               else
-                  std::cout << "ERROR: PhysiFBA_metabolite " << sbml_species->getSpecies() << " not found" << std::endl;
+                  std::cout << "ERROR: FBA_metabolite " << sbml_species->getSpecies() << " not found" << std::endl;
           }
           this->addReaction(reaction);
       }
@@ -253,14 +253,14 @@ namespace PhysiFBA{
           libsbml::FluxObjective* fluxObjective = listOfFluxObjectives->get(i);
           std::string rId = fluxObjective->getReaction();
           double objectiveCoefficient = fluxObjective->getCoefficient();
-          PhysiFBA_reaction* reaction = this->getReaction(rId);
+          FBA_reaction* reaction = this->getReaction(rId);
           reaction->setObjectiveCoefficient(objectiveCoefficient);
       }
 
       delete document;
   }
 
-  void PhysiFBA_model::initLpModel()
+  void FBA_model::initLpModel()
   {
 
       int n_rows = this->getNumMetabolites();
@@ -282,18 +282,18 @@ namespace PhysiFBA{
           row_lb[i] = 0;
           row_ub[i] = 0;
       }
-      for(PhysiFBA_reaction* reaction: this->reactions)
+      for(FBA_reaction* reaction: this->reactions)
       {
           int col_idx = this->reactionsIndexer[reaction->getId()];
           col_lb[col_idx] = reaction->getLowerBound();
           col_ub[col_idx] = reaction->getUpperBound();
           objective[col_idx] = reaction->getObjectiveCoefficient();
 
-          const std::map<const PhysiFBA_metabolite*, double> metabolites = reaction->getMetabolites();
+          const std::map<const FBA_metabolite*, double> metabolites = reaction->getMetabolites();
           CoinPackedVector col;
           for(auto it=metabolites.begin(); it!=metabolites.end(); it++)
           {
-              const PhysiFBA_metabolite* metabolite = it->first;
+              const FBA_metabolite* metabolite = it->first;
               double stoich_coeff = it->second;
               int row_idx = this->metaboliteIndexer[metabolite->getId()];
               col.insert(row_idx, stoich_coeff);
@@ -311,19 +311,23 @@ namespace PhysiFBA{
       delete objective;
   }
 
-  void PhysiFBA_model::writeLp(const char *filename)
+  void FBA_model::writeLp(const char *filename)
   {
     //this->lp_model->writeLp(filename, "lp");
   }
 
-  void PhysiFBA_model::runFBA()
+  void FBA_model::runFBA()
   {
       std::cout << "Before running" << std::endl;
       this->lp_model->primal();
+<<<<<<< HEAD
+=======
+      std::cout << "After running" << std::endl;
+>>>>>>> 5fb0001207b22eb032ece6ef408df8fb9f1df5b4
       if ( lp_model->isProvenOptimal() )
       {
           double * columnPrimal = this->lp_model->primalColumnSolution();
-          for(PhysiFBA_reaction* reaction: this->reactions)
+          for(FBA_reaction* reaction: this->reactions)
           {
               int idx = this->reactionsIndexer[reaction->getId()];
               double v = columnPrimal[idx];
@@ -336,7 +340,7 @@ namespace PhysiFBA{
       }
   }
 
-  bool PhysiFBA_model::getSolutionStatus()
+  bool FBA_model::getSolutionStatus()
   {
       if (this->lp_model)
       {
@@ -346,7 +350,7 @@ namespace PhysiFBA{
       return false;
   }
 
-  float PhysiFBA_model::getObjectiveValue()
+  float FBA_model::getObjectiveValue()
   {
       assert(("LP problem must be initialzed first using initLpModel()", this->lp_model != nullptr));
       if (this->lp_model->isProvenOptimal())

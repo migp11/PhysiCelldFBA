@@ -6,3 +6,5 @@
 unit-test-conservation.exe
 Makefile-backup
 *.exe
+
+.vscode/

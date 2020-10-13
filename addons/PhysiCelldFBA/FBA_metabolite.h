@@ -12,15 +12,15 @@
 #include <vector>
 #include <map>
 
-class PhysiFBA_metabolite
+class FBA_metabolite
 {
 	private:
 		std::string id;
 		std::string name;
 
 	public:
-		PhysiFBA_metabolite(std::string id);
-		~PhysiFBA_metabolite();
+		FBA_metabolite(std::string id);
+		~FBA_metabolite();
 
 		const std::string& getId() const;
 

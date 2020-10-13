@@ -42,6 +42,23 @@
         <fbc:geneProductAssociation>
           <fbc:geneProductRef fbc:geneProduct="G_GLUT"/>
         </fbc:geneProductAssociation>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+              <apply>
+                <divide/>
+                <apply>
+                  <times/><ci> Vmax </ci><ci> M_m07c </ci>
+                </apply>
+                <apply>
+                  <plus/><ci> Km </ci><ci> M_m07c </ci>
+                </apply>
+              </apply>
+          </math>
+          <listOfLocalParameters>
+            <localParameter id="Vmax" value="1" units="mmol_per_gDW_per_hr"/>
+            <localParameter id="Km" value="1" units="mmol_per_gDW_per_hr"/>
+          </listOfLocalParameters>
+        </kineticLaw>
       </reaction>
       <reaction id="R_E2" name="lactate exchange" reversible="false" fast="false" fbc:lowerFluxBound="cobra_0_bound" fbc:upperFluxBound="cobra_default_ub">
         <listOfReactants>
@@ -50,6 +67,23 @@
         <fbc:geneProductAssociation>
           <fbc:geneProductRef fbc:geneProduct="G_LDH"/>
         </fbc:geneProductAssociation>
+        <kineticLaw>
+          <math xmlns="http://www.w3.org/1998/Math/MathML">
+              <apply>
+                <divide/>
+                <apply>
+                  <times/><ci> Vmax </ci><ci> M_m07c </ci>
+                </apply>
+                <apply>
+                  <plus/><ci> Km </ci><ci> M_m07c </ci>
+                </apply>
+              </apply>
+          </math>
+          <listOfLocalParameters>
+            <localParameter id="Vmax" value="1" units="mmol_per_gDW_per_hr"/>
+            <localParameter id="Km" value="1" units="mmol_per_gDW_per_hr"/>
+          </listOfLocalParameters>
+        </kineticLaw>
       </reaction>
       <reaction id="R_E3" name="O2 exchange" reversible="true" fast="false" fbc:lowerFluxBound="cobra_default_lb" fbc:upperFluxBound="cobra_default_ub">
         <listOfReactants>
