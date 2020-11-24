@@ -320,10 +320,7 @@ namespace FBA{
   {
       std::cout << "Before running" << std::endl;
       this->lp_model->primal();
-<<<<<<< HEAD
-=======
       std::cout << "After running" << std::endl;
->>>>>>> 5fb0001207b22eb032ece6ef408df8fb9f1df5b4
       if ( lp_model->isProvenOptimal() )
       {
           double * columnPrimal = this->lp_model->primalColumnSolution();

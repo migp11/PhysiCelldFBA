@@ -1,12 +1,111 @@
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems.
 
-**Version:** 1.7.0
+**Version:** 1.7.1
 
-**Release date:** ?? March 2020
+**Release date:** 2 June 2020
 
 ## Release summary: 
 
-This release ...  
+This release introduces bug fixes (particularly the placement of daughter cells after division), introduces new functions for uniformly random sampling of the unit circle and unit sphere, and refines the beta implementation of XML-based cell definitions. 
+
+**NOTE:** OSX users must now define PHYSICELL_CPP system variable. See the documentation.
+ 
+### Major new features and changes:
+
++ No major changes. See 1.7.0 for most recent major changes. 
+
+### Minor new features and changes: 
+
++ Created new function std::vector<double> UniformOnUnitSphere( void ) that returns a (uniformly) random vector (x,y,z) on the unit sphere. 
+
++ Created new function std::vector<double> UniformOnUnitCircle( void ) that returns a (uniformly) random vector (x,y,0) on the unit circle (in the z = 0 plane).  
+
++ Created std::vector<double> LegacyRandomOnUnitSphere() that reproduces old behaviors of creating a random vector on the unit sphere. Never use this except if trying to replicate old results. Always use UniformOnUnitSphere() instead. 
+
++ Changed default placement of daughter cells to use UniformOnUnitCircle(), in response to longstanding "future plan" to "introduce improvements to placement of daughter cells after division."
+
++ All sample projects now check for <options> in their XML config files. 
+
++ Template projects calculate gradients and perform internal substrate tracking by default. 
+
++ Moved the bool is_active from "protected" to "public" in the Basic_Agent class in BioFVM_basic_agent.h, so that cells be be moved back into the domain and reactivated as needed. 
+
++ Changed beta implementation of XML cell definitions: 
+  + In cycle, transition_rates renamed to phase_transition_rates. PhysiCell will give a deprecatoin warning for transition_rates until the official release of XML cell definitions. 
+  + In death, rates renamed to death_rates. PhysiCell will give a deprecatoin warning for transition_rates until the official release of XML cell definitions. 
+  + In cycle and death, "phase_durations" can now be used in place of phase_transition rates. This may be more intuitive for some modelers. 
+
++ See 1.7.0 for other recent minor changes.
+
+### Beta features (not fully supported):
+ 
++ Cell definitions can now be defined by XML files. See the note above. This functionality may be additionally refined or modified in the next few releases while still in beta. 
+  
+### Bugfixes: 
+
++ In response to SourceForge ticket 26, fixed placement of parent cell in Cell::divide()
+
++ Removed errant Cell_Definition in the new template sample project. 
+
++ Added an extra check for bad chemotaxis definitions in response ot SourceForge ticket 28. 
+
++ Fixed bugs in processing of the "death" section of XML cell definitions.  
+
+### Notices for intended changes that may affect backwards compatibility:
+ 
++ We intend to merge Custom_Variable and Custom_Vector_Variable in the very near future.  
+
++ We may change the role of operator() and operator[] in Custom_Variable to more closely mirror the functionality in Parameters<T>. 
+
++ Some search functions (e.g., to find a substrate or a custom variable) will start to return -1 if no matches are found, rather than 0. 
+ 
++ We will change the timing of when entry_functions are executed within cycle models. Right now, they are evaluated immediately after the exit from the preceding phase (and prior to any cell division events), which means that only the parent cell executes it, rather htan both daughter cells. Instead, we'll add an internal Boolean for "just exited a phase", and use this to exucte the entry function at the next cycle call. This should make daughter cells independently execute the entry function. 
+
++ We might make "trigger_death" clear out all the cell's functions, or at least add an option to do this. 
+
+### Planned future improvements: 
+
++ Methods or scripts to make "upgrading" PhysiCell easier for existing projects (to avoid overwriting the config file, Makefile, or custom files. 
+ 
++ Current "template" project will be rolled into a new "predator-prey" sample project, and "template" will be tidied up. 
+
++ Further XML-based simulation setup. 
+
++ current sample projects will be refactored to use XML cdell definitions. 
+ 
++ read saved simulation states (as MultiCellDS digital snapshots)
+ 
++ "mainline" prototype cell attach/detach mechanics as standard models (currently in the biorobots and immune examples)
+ 
++ integrate SBML-encoded systems of ODEs as custom data and functions for molecular-scale modeling 
+  
++ integrate Boolean network support from PhysiBoSS into the mainline code (See http://dx.doi.org/10.1093/bioinformatics/bty766. )
+  
++ Develop contact-based cell-cell interactions. 
+
++ Add cell differentiation functionality to Phenotype, to be executed during cell division events. 
+ 
++ Add a new standard phenotype function that uses mechanobiology, where high pressure can arrest cycle progression. (See https://twitter.com/MathCancer/status/1022555441518338048.) 
+ 
++ Add module for standardized pharmacodynamics, as prototyped in the nanobio project. (See https://nanohub.org/resources/pc4nanobio.) 
+ 
++ create an angiogenesis sample project 
+ 
++ create a small library of angiogenesis and vascularization codes as an optional standard module in ./modules (but not as a core component)
+
++ improved plotting options in SVG 
+
+* * * 
+
+# PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems.
+
+**Version:** 1.7.0
+
+**Release date:** 12 May 2020
+
+## Release summary: 
+
+This release (1) adds "net export" as a new form of more generalized substrate secretion, (2) adds helper funtions for cell size and volume for esier configuration, (3) adds a new, standardized chemotaxis function, (4) adds 1D diffusion, and (5) introduces XML-based cell definitions as a beta feature. It also incorporates a variety of bugfixes.   
 
 **NOTE:** OSX users must now define PHYSICELL_CPP system variable. See the documentation.
  
@@ -18,15 +117,36 @@ This release ...
    + void Cell::set_target_volume( double new_volume ) sets the target total cell volume, while preserving the desired nuclear:cytoplasmic ratio and desired fluid fraction. In the default cell volume model, the cell will now approach this value by shrinking or growing. 
    + void Cell::set_target_radius( double new_radius ) behaves similarly, but using a radius instead. 
 
-+ Added Cell:set_radius( double new_radius ) to set the cell's current radius to the new value, preserving the nuclear:cytoplasmic ratio and fluid fraction. Note that this does not change the target values, so the cell will shrink or grow back towards its current target size. 
++ Added Cell::set_radius( double new_radius ) to set the cell's current radius to the new value, preserving the nuclear:cytoplasmic ratio and fluid fraction. Note that this does not change the target values, so the cell will shrink or grow back towards its current target size. 
 
++ Added 1-D diffusion solvers to BioFVM (useful for some coarse-grained problems). It solves for diffusion in the x-direction only. Use it by setting: 
 
+  microenvironment.diffusion_decay_solver = diffusion_decay_solver__constant_coefficients_LOD_1D
+  
+  Use this right after setup_microenvironment() in your main.cpp file. Future versions will include an XML option to use 1D. Most users will never need this. 
+  
++ Added a standardized chemotaxis function to the standard models: 
 
-+ Cell_Definitions in XML. This is in response to SourceForge ticket 5. 
-   +
-   +
+     void chemotaxis_direction( Cell* pCell , Phenotype& phenotype , double dt ); 
+
+  This sets:
+  
+     phenotype.motility.motility_bias_direction = direction * grad( index ), where 
+    
+     direction = phenotype.motility.chemotaxis_direction 
+        (1 to go up gradient, -1 to go down gradient)
+     index = phenotype.motility.chemotaxis_index 
+        (the index of one of hte diffusing substrates)
+
++ Added Cell_Definitions in XML (beta feature) in response to SourceForge ticket 5. Users will be able to set the cell defaults definition by XML, as well as additional cell definitions that "inherit" phenotype parameters from cell defaults. This vastly reduces teh amount of necessary C++ to define a model. The new "template" sample project unifies 2D and 3D model specification using the new XML-based cell definitions. The next few releases will refine documentation and roll teh new XML-based cell definitions out to all the other sample projects. 
 
 ### Minor new features and changes: 
+
++ Created get_cell_definition(std::string) to return by reference the matching cell definition (search by name). Returns cell_defaults if nothing found. 
+
++ Created get_cell_definition(int) to return by reference the matching cell definition (search by type). Returns cell_defaults if nothing found. 
+
++ added int chemotaxis_index and chemotaxis_direction to the Motility class to assist with a new standard chemotaxis function. 
  
 + scale_all_secretion_by_factor also scales net_export_rates.
 
@@ -88,9 +208,14 @@ This release ...
 
 ### Beta features (not fully supported):
  
-+ List here. 
++ Cell definitions can now be defined by XML files. See the note above. This functionality may be additionally refined in the next few releases while still in beta. 
+
   
 ### Bugfixes: 
+
++ In response to SourceForge ticket 25, added cell_defaults.phenotype.molecular.sync_to_microenvironment( &microenvironment ); to the create_cell_types() functions in the 2D and 3D template projects. 
+
++ In response to SourceForge ticket 18, update_cell_and_death_parameters_O2_based() now checks for deterministic necrosis. 
 
 + In response to GitHub issue 33, fixed issue where data-cleanup makefile rule gets a list of too many files. Rolled the new rule through to all the sample Makefiles as well. 
 

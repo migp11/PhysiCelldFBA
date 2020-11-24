@@ -75,7 +75,14 @@
 #include "./PhysiCell_cell_container.h"
 #include "./PhysiCell_constants.h"
 
-#include "../addons/PhysiCelldFBA/FBA_model.h"
+#include "../modules/PhysiCell_settings.h" 
+
+#include "./PhysiCell_standard_models.h" 
+
+#ifdef ADDON_PCdFBA
+#include "../addons/PCdFBA/FBA_model.h"
+#endif
+
 
 using namespace BioFVM; 
 
@@ -161,18 +168,9 @@ class Cell : public Basic_Agent
 	Cell_State state; 
 	Phenotype phenotype; 
 
-	/* ============================================== */
-	/* PhysiFBA */
+#ifdef ADDON_PCdFBA
 	FBA::FBA_model fba_model;
-	/* ============================================== */
-
-	
-	//============================================== 
-        // PhysiCelldFBA 
-        //==============================================
-	FBA::FBA_model fba_model;
-	//==============================================
-
+#endif
 
 	void update_motility_vector( double dt_ );
 	void advance_bundled_phenotype_functions( double dt_ ); 
@@ -256,6 +254,16 @@ void build_cell_definitions_maps( void ); // done
 
 Cell_Definition* find_cell_definition( std::string search_string ); // done 
 Cell_Definition* find_cell_definition( int search_type );  
+
+Cell_Definition& get_cell_definition( std::string search_string ); // done 
+Cell_Definition& get_cell_definition( int search_type );  
+
+Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node ); 
+void initialize_cell_definitions_from_pugixml( pugi::xml_node root ); 
+void initialize_cell_definitions_from_pugixml( void );
+
+extern std::vector<double> (*cell_division_orientation)(void);
+
 
 };
 

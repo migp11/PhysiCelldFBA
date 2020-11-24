@@ -1,8 +1,8 @@
 # PhysiCell: an Open Source Physics-Based Cell Simulator for 3-D Multicellular Systems.
 
-**Version:** 1.6.1
+**Version:** 1.7.1
 
-**Release date:** 26 January 2020
+**Release date:** 2 June 2020
 
 ## Overview: 
 PhysiCell is a flexible open source framework for building agent-based multicellular models in 3-D tissue environments.
@@ -32,6 +32,7 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
     heterogeneity-sample
     cancer-immune-sample 
     virus-macrophage-sample
+    template
 
 **make list-projects** : list all available sample projects 
 
@@ -59,62 +60,58 @@ Visit http://MathCancer.org/blog for the latest tutorials and help.
 See changes.md for the full change log. 
 
 * * * 
-
 ## Release summary: 
 
-This release fixes minor bugs and improves the documentation. It also adds some minor new capabilities, such as setting time step sizes in the XML configuration file. 
+This release introduces bug fixes (particularly the placement of daughter cells after division), introduces new functions for uniformly random sampling of the unit circle and unit sphere, and refines the beta implementation of XML-based cell definitions. 
 
 **NOTE:** OSX users must now define PHYSICELL_CPP system variable. See the documentation.
  
 ### Major new features and changes:
 
-+ List here. 
- 
++ No major changes. See 1.7.0 for most recent major changes. 
+
 ### Minor new features and changes: 
- 
-+ "make list-projects" now displayed to standard output a list of all the sample projects. 
 
-+ dt_diffusion, dt_mechanics, and dt_phenotype can now be set via the XML configuration file in the options section. 
++ Created new function std::vector<double> UniformOnUnitSphere( void ) that returns a (uniformly) random vector (x,y,z) on the unit sphere. 
 
-+ Added documentation on the time step sizes to the User Guide. 
++ Created new function std::vector<double> UniformOnUnitCircle( void ) that returns a (uniformly) random vector (x,y,0) on the unit circle (in the z = 0 plane).  
 
-+ Preliminary work to support Travis CI testing. 
++ Created std::vector<double> LegacyRandomOnUnitSphere() that reproduces old behaviors of creating a random vector on the unit sphere. Never use this except if trying to replicate old results. Always use UniformOnUnitSphere() instead. 
 
-+ Updated documentation to note that Cell::start_death is the preferred method to trigger cell death, and NOT Death::trigger_death. 
++ Changed default placement of daughter cells to use UniformOnUnitCircle(), in response to longstanding "future plan" to "introduce improvements to placement of daughter cells after division."
 
-+ Updated Microenvironment::compute_all_gradient_vectors to now compute one-sized gradients on edge voxels. (Previously, no gradient was computed here.) 
++ All sample projects now check for <options> in their XML config files. 
 
-+ Updated Microenvironment::compute_all_gradient_vectors to check if there is no z-direction (i.e., 2D) and exit early if so. 
++ Template projects calculate gradients and perform internal substrate tracking by default. 
 
-+ Updated Microenvironment::compute_all_gradient_vectors to check if there is no y-direction (i.e., 1D) and exit early if so. 
++ Moved the bool is_active from "protected" to "public" in the Basic_Agent class in BioFVM_basic_agent.h, so that cells be be moved back into the domain and reactivated as needed. 
 
-+ Made PhysiCell_constants.cpp (and added this to the core of all project makefiles) so that dt and other variables can be non-static (i.e., set by XML options). 
++ Changed beta implementation of XML cell definitions: 
+  + In cycle, transition_rates renamed to phase_transition_rates. PhysiCell will give a deprecatoin warning for transition_rates until the official release of XML cell definitions. 
+  + In death, rates renamed to death_rates. PhysiCell will give a deprecatoin warning for transition_rates until the official release of XML cell definitions. 
+  + In cycle and death, "phase_durations" can now be used in place of phase_transition rates. This may be more intuitive for some modelers. 
 
-+ Added "make checkpoint" rule to makefiles. This zips up the user-custom stuff (./config, ./, ./custom_modules) into a timestamped zip file. Use this before upgrading PhysiCell to make sure you keep your own Makefile, etc. 
- 
++ See 1.7.0 for other recent minor changes.
+
 ### Beta features (not fully supported):
  
-+ List here. 
++ Cell definitions can now be defined by XML files. See the note above. This functionality may be additionally refined or modified in the next few releases while still in beta. 
   
 ### Bugfixes: 
 
-+ BioFVM's diffusion_decay_solver__constant_coefficients_LOD_3D, diffusion_decay_solver__constant_coefficients_LOD_2D check for regular meshes instead of uniform meshes. 
++ In response to SourceForge ticket 26, fixed placement of parent cell in Cell::divide()
 
-+ Biorobots sample project fixed bugs on searching for substrates vs. searching for cell types. 
++ Removed errant Cell_Definition in the new template sample project. 
 
-+ In BioFVM_vectors, the normalize functions now return a zero vector if the vector's norm is less than 1e-16. This is for John Metzcar. 
++ Added an extra check for bad chemotaxis definitions in response ot SourceForge ticket 28. 
 
-+ In PhysiCell_Cell.cpp, made fixes to Cell::divide() and Cell::assign_position() to fix a bug where cells dividing on the edge of the domain woudl place a daughter cell at (0,0,0). Thanks, Andrew Eckel!
++ Fixed bugs in processing of the "death" section of XML cell definitions.  
 
-+ Code cleanup in PhysiCell_cell_container in Cell_Container::update_all_cells() as suggested by Andrew Eckel. Thanks! 
- 
 ### Notices for intended changes that may affect backwards compatibility:
  
 + We intend to merge Custom_Variable and Custom_Vector_Variable in the very near future.  
 
 + We may change the role of operator() and operator[] in Custom_Variable to more closely mirror the functionality in Parameters<T>. 
-
-+ We will introduce improvements to placement of daughter cells after division. 
 
 + Some search functions (e.g., to find a substrate or a custom variable) will start to return -1 if no matches are found, rather than 0. 
  
@@ -123,8 +120,14 @@ This release fixes minor bugs and improves the documentation. It also adds some 
 + We might make "trigger_death" clear out all the cell's functions, or at least add an option to do this. 
 
 ### Planned future improvements: 
+
++ Methods or scripts to make "upgrading" PhysiCell easier for existing projects (to avoid overwriting the config file, Makefile, or custom files. 
  
++ Current "template" project will be rolled into a new "predator-prey" sample project, and "template" will be tidied up. 
+
 + Further XML-based simulation setup. 
+
++ current sample projects will be refactored to use XML cdell definitions. 
  
 + read saved simulation states (as MultiCellDS digital snapshots)
  

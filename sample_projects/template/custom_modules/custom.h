@@ -66,39 +66,26 @@
 */
 
 #include "../core/PhysiCell.h"
-#include "../modules/PhysiCell_standard_modules.h"
-#include "../addons/PhysiCelldFBA/FBA_model.h"
+#include "../modules/PhysiCell_standard_modules.h" 
 
-using namespace BioFVM;
+using namespace BioFVM; 
 using namespace PhysiCell;
-using namespace FBA;
 
-
-// any additional cell types (beyond cell_defaults)
-
-extern Cell_Definition motile_cell;
-
-// custom cell phenotype functions could go here
-
-// setup functions to help us along
+// setup functions to help us along 
 
 void create_cell_types( void );
-void setup_tissue( void );
+void setup_tissue( void ); 
 
-// set up the BioFVM microenvironment
-void setup_microenvironment( void );
+// set up the BioFVM microenvironment 
+void setup_microenvironment( void ); 
 
-
-// custom pathology coloring function
-
-std::vector<double> integrate_total_substrates( void );
-
-void anuclear_volume_model (Cell* pCell, Phenotype& phenotype, double dt);
-
-void setup_default_metabolic_model( void );
-
-void update_cell(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double dt );
-
-void metabolic_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt );
+// custom pathology coloring function 
 
 std::vector<std::string> my_coloring_function( Cell* );
+
+// custom functions can go here 
+
+void predator_hunting_function( Cell* pCell, Phenotype& phenotype, double dt ); 
+void predator_cycling_function( Cell* pCell, Phenotype& phenotype, double dt ); 
+
+void prey_cycling_function( Cell* pCell , Phenotype& phenotype, double dt ); 
