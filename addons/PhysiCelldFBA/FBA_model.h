@@ -13,12 +13,12 @@
 #include <map>
 #include <vector>
 
+#include <sbml/SBMLTypes.h>
+#include <sbml/packages/fbc/common/FbcExtensionTypes.h>
+
 #include <coin-or/CoinPackedMatrix.hpp>
 #include <coin-or/CoinPackedVector.hpp>
 #include <coin-or/ClpSimplex.hpp>
-
-#include <sbml/SBMLTypes.h>
-#include <sbml/packages/fbc/common/FbcExtensionTypes.h>
 
 #include "FBA_metabolite.h"
 #include "FBA_reaction.h"
