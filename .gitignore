@@ -1,3 +1,5 @@
+
+
 .vscode/
 .cproject
 .project
@@ -8,3 +10,6 @@ Makefile-backup
 *.exe
 
 .vscode/
+
+./addons/PCdFBA/coin-or/
+./addons/PCdFBA/build/*.o

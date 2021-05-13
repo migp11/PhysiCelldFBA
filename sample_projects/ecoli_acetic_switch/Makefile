@@ -40,7 +40,8 @@ CFLAGS := -march=$(ARCH) -ggdb -fomit-frame-pointer -mfpmath=both -fopenmp -m64 
 
 CLP_FOLDER := ./addons/coin-clp
 
-INC := -I/usr/local/include -DADDON_PCdFBA -I$(CLP_FOLDER)/include -I./addons/coin-clp/include/coin-or/glpk
+
+INC := -I/usr/local/include -DADDON_PCdFBA -I$(CLP_FOLDER)/include -I$(CLP_FOLDER)/include/coin-or/glpk
 LIBS := -L/usr/local/lib -L$(CLP_FOLDER)/lib -ldl -lm -lClp -lCoinUtils -lcoinasl -lcoinglpk -lcoinmumps -lsbml
 
 COMPILE_COMMAND := $(CC) $(CFLAGS)

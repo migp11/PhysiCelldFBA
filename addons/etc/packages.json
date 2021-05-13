@@ -1,20 +1,20 @@
 {
     "coin-clp": {
         "linux": {
-                "version": "Clp-refactor-static-bionic-linux-x86_64-gcc7.tgz",
-                "url": "https://bintray.com/coin-or/download/download_file?file_path=Clp-refactor-static-bionic-linux-x86_64-gcc7.tgz",
-                "sha256": "17b2f859ec481f06650a0481d14bdd1c51cb47071f8381b2e24d1b6de200f471"
+                "version": "Clp-master-static-bionic-linux-x86_64-gcc7.tgz",
+                "url": "https://www.coin-or.org/download/binary/Clp/Clp-master-static-bionic-linux-x86_64-gcc7.tgz",
+                "sha256": "5101b29b97df89ea1684261f2c81b7554c23e00f93afa5c0cb5c67cd23f13a50"
                 },
-            "win64": {
-                "version": "Clp-refactor-win64-msvc14-mdd.zip",
-                "url": "https://bintray.com/coin-or/download/download_file?file_path=Clp-refactor-win64-msvc14-mdd.zip",
-                "sha256": "d6a4ac584f1eefe01a1a06b648e6d3cd2af1b313fa879ab5a8ec4ccc7d6c3504"
+        "win64": {
+                "version": "Clp-master-x86_64-w64-mingw32.zip",
+                "url": "https://www.coin-or.org/download/binary/Clp/Clp-master-x86_64-w64-mingw32.zip",
+                "sha256": "55d1133e0bfb93b9065f18d1ce38f22398b57ba671bf0477fdb4606900d1b964"
             },
-            "osx":
+        "osx":
             {
-                "version": "Clp-refactor-osx10.14-x86_64-gcc9.tgz",
-                "url": "https://bintray.com/coin-or/download/download_file?file_path=Clp-refactor-osx10.14-x86_64-clang11.tgz",
-                "sha256": "17943cdd5aa1c8cd66e885cb1d894a8dd38aa2c575fec392b35e656f1dd2da05"
+                "version": "Clp-master-osx10.14-x86_64-gcc9.tgz",
+                "url": "https://www.coin-or.org/download/binary/Clp/Clp-master-osx10.14-x86_64-gcc9.tgz",
+                "sha256": "5eeffa12179749e6a33ecadfceeeca798bba75534b88e2f5a306081ef3b0c2db"
             }
         } 
 }
