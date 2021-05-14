@@ -85,30 +85,31 @@
 		<dz>20</dz>
 		<use_2D>true</use_2D>
 	</domain>
-		
+	
 	<overall>
-		<max_time units="min">720</max_time> <!-- 5 days * 24 h * 60 min -->
+		<max_time units="min">7200</max_time> <!-- 5 days * 24 h * 60 min -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
-		<dt_diffusion units="min">0.005</dt_diffusion>
-		<dt_mechanics units="min">0.05</dt_mechanics>
-		<dt_phenotype units="min">3</dt_phenotype>
+	
+		<dt_diffusion units="min">0.01</dt_diffusion>
+		<dt_mechanics units="min">0.1</dt_mechanics>
+		<dt_phenotype units="min">6</dt_phenotype>	
 	</overall>
 	
 	<parallel>
 		<omp_num_threads>4</omp_num_threads>
 	</parallel> 
-		
+	
 	<save>
 		<folder>output</folder> <!-- use . for root --> 
 
 		<full_data>
-			<interval units="min">20</interval>
+			<interval units="min">60</interval>
 			<enable>true</enable>
 		</full_data>
 		
 		<SVG>
-			<interval units="min">20</interval>
+			<interval units="min">15</interval>
 			<enable>true</enable>
 		</SVG>
 		
@@ -123,34 +124,67 @@
 	</options>	
 
 	<microenvironment_setup>
-		<variable name="glucose" units="pmol" ID="1">
+		<variable name="food" units="dimensionless" ID="0">
 			<physical_parameter_set>
-				<diffusion_coefficient units="micron^2/min">600.00</diffusion_coefficient> <!-- https://bionumbers.hms.harvard.edu/bionumber.aspx?id=104089&ver=7 --> 
-				<decay_rate units="1/min">.1</decay_rate>  
+				<diffusion_coefficient units="micron^2/min">100.0</diffusion_coefficient>
+				<decay_rate units="1/min">0</decay_rate>  
 			</physical_parameter_set>
-			<initial_condition units="pmol">0.09</initial_condition>
-			<Dirichlet_boundary_condition units="pmol" enabled="false">0.09</Dirichlet_boundary_condition>
-		</variable>
-		<variable name="lactate" units="pmol" ID="2">
-			<physical_parameter_set>
-				<diffusion_coefficient units="micron^2/min">600.00</diffusion_coefficient>
-				<decay_rate units="1/min">.1</decay_rate>  
-			</physical_parameter_set>
-			<initial_condition units="pmol">0.0</initial_condition>
-			<Dirichlet_boundary_condition units="pmol" enabled="false">0.0</Dirichlet_boundary_condition>
-		</variable>
+			<initial_condition units="dimensionless">1</initial_condition>
+			<Dirichlet_boundary_condition units="dimensionless" enabled="false">0</Dirichlet_boundary_condition>
+<!-- use this block to set Dirichlet boundary conditions on individual boundaries --> 
+<!--
+			<Dirichlet_options>
+				<boundary_value ID="xmin" enabled="false">0</boundary_value>
+				<boundary_value ID="xmax" enabled="false">0</boundary_value>
+				<boundary_value ID="ymin" enabled="false">0</boundary_value>
+				<boundary_value ID="ymax" enabled="false">0</boundary_value>
+				<boundary_value ID="zmin" enabled="false">1</boundary_value>
+				<boundary_value ID="zmax" enabled="false">0</boundary_value>
+			</Dirichlet_options>
+-->			
+ 		</variable>
 		
-
-				<diffusion_coefficient units="micron^2/min">100000.0</diffusion_coefficient>
-				<decay_rate units="1/min">10</decay_rate>  
-
+		<variable name="prey signal" units="dimensionless" ID="1">
+			<physical_parameter_set>
 				<diffusion_coefficient units="micron^2/min">1000.0</diffusion_coefficient>
 				<decay_rate units="1/min">.1</decay_rate>  
-
 			</physical_parameter_set>
 			<initial_condition units="dimensionless">0</initial_condition>
 			<Dirichlet_boundary_condition units="dimensionless" enabled="true">0</Dirichlet_boundary_condition>
+<!-- use this block to set Dirichlet boundary conditions on individual boundaries --> 
+<!--
+			<Dirichlet_options>
+				<boundary_value ID="xmin" enabled="false">0</boundary_value>
+				<boundary_value ID="xmax" enabled="false">0</boundary_value>
+				<boundary_value ID="ymin" enabled="false">0</boundary_value>
+				<boundary_value ID="ymax" enabled="false">0</boundary_value>
+				<boundary_value ID="zmin" enabled="false">1</boundary_value>
+				<boundary_value ID="zmax" enabled="false">0</boundary_value>
+			</Dirichlet_options>
+-->
+ 		</variable>		
 
+		<variable name="predator signal" units="dimensionless" ID="2">
+			<physical_parameter_set>
+				<diffusion_coefficient units="micron^2/min">1000.0</diffusion_coefficient>
+				<decay_rate units="1/min">.1</decay_rate>  
+			</physical_parameter_set>
+			<initial_condition units="dimensionless">0</initial_condition>
+			<Dirichlet_boundary_condition units="dimensionless" enabled="true">0</Dirichlet_boundary_condition>
+<!-- use this block to set Dirichlet boundary conditions on individual boundaries --> 
+<!--
+			<Dirichlet_options>
+				<boundary_value ID="xmin" enabled="false">0</boundary_value>
+				<boundary_value ID="xmax" enabled="false">0</boundary_value>
+				<boundary_value ID="ymin" enabled="false">0</boundary_value>
+				<boundary_value ID="ymax" enabled="false">0</boundary_value>
+				<boundary_value ID="zmin" enabled="false">1</boundary_value>
+				<boundary_value ID="zmax" enabled="false">0</boundary_value>
+			</Dirichlet_options>
+-->
+ 		</variable>		
+
+		
 		<options>
 			<calculate_gradients>true</calculate_gradients>
 			<track_internalized_substrates_in_each_agent>true</track_internalized_substrates_in_each_agent>
@@ -165,39 +199,6 @@
 		</options>
 	</microenvironment_setup>	
 	
-<<<<<<< HEAD
-	<user_parameters>
-		<random_seed type="int" units="dimensionless">50</random_seed> 
-<<<<<<< HEAD
-		<tumor_radius type="double" units="micron">50.0</tumor_radius>
-        <!-- PhysiFBA parameters --> 
-        <sbml_model type="string" units="">./config/Ecoli_core.xml</sbml_model>
-=======
-		<colony_radius type="double" units="micron">50.0</colony_radius>
-	        <!-- PhysiFBA parameters --> 
-	        <sbml_model type="string" units="">./config/Ecoli_core.xml</sbml_model>
->>>>>>> 5fb0001207b22eb032ece6ef408df8fb9f1df5b4
-
-		<oxygen_Km type="double" units="mmol">20</oxygen_Km>
-		<oxygen_Vmax type="double" units="mmol/t">40</oxygen_Vmax>
-        
-<<<<<<< HEAD
-       	<glucose_Km type="double" units="mmol">1</glucose_Km>
-        <glucose_Vmax type="double" units="mmol">1</glucose_Vmax>
-        
-		<acetate_Km type="double" units="mmol">1</lactate_Km>
-        <acetate_Vmax type="double" units="mmol">1</lactate_Vmax>	
-=======
-		<!-- Km 4.0 mg/L  -->
-		<!-- Km 0.032 fg/Voxel  -->
-		<!-- Km 0.0001 fmol/Voxel -->
-		<glucose_Km type="double" units="mmol">4.0</glucose_Km>
-		<!-- 11 fmol/fgDW -->
-	        <glucose_Vmax type="double" units="fmol/fgDW">11</glucose_Vmax>
-        
-		<acetate_Km type="double" units="mmol">1</acetate_Km>
-	        <acetate_Vmax type="double" units="mmol">1</acetate_Vmax>
-=======
 	<cell_definitions>
 		<cell_definition name="farmer" ID="0">
 			<phenotype>
@@ -443,32 +444,7 @@
 		
 		<div_initialization type="divider" description="---Initialization settings---"/>
 		
-<<<<<<< HEAD
-		<number_of_prey type="int" units="none" description="initial number of prey">50</number_of_prey>
-		<number_of_predators type="int" units="none" description="initial number of predators">5</number_of_predators> 
-		
-		<div_coloring type="divider" description="---Coloring settings---"/>
-
-		<prey_color type="string" description="color for prey">blue</prey_color>
-		<predator_color type="string" description="color for prey">orange</predator_color>
-		
-		<div_predator type="divider" description="---Predator settings---"/>
-		<predators_eat_prey type="bool" description="set to true if predators can eat prey">true</predators_eat_prey>
-		<predators_cycle_if_big type="bool" description="set to true if predators should cycle if they are well-fed (and thus big)">true</predators_cycle_if_big>
-		
-		<div_prey type="divider" description="---Prey settings---"/>
-		<prey_quorom_effect type="bool" description="set to true if prey signal down-regulates cycling">true</prey_quorom_effect>
-		<prey_quorom_threshold type="double" description="prey signal > threshold completely arrests cycling">0.2</prey_quorom_threshold>
->>>>>>> upstream/master
-		
-		<!-- BNID:103904 -->
-		<dry_weight type="double" units="fg">280</dry_weight> 
-		<doubling_time type="double" units="min">40</doubling_time>
-		<cell_radius type="double" units="micron">0.26</cell_radius>
->>>>>>> 5fb0001207b22eb032ece6ef408df8fb9f1df5b4
-=======
 		<number_of_cells type="int" units="none" description="initial number of cells (for each cell type)">15</number_of_cells>
->>>>>>> 81e85ce1dcb7156864a4460666e60878b82d3e97
 	</user_parameters>
 	
 </PhysiCell_settings>
