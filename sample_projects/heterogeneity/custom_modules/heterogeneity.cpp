@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -70,11 +70,10 @@
 
 void create_cell_types( void )
 {
-	// use the same random seed so that future experiments have the 
-	// same initial histogram of oncoprotein, even if threading means 
-	// that future division and other events are still not identical 
-	// for all runs 
+	// set the random seed 
+	SeedRandom( parameters.ints("random_seed") );  
 	
+<<<<<<< HEAD
 	SeedRandom( parameters.ints( "random_seed" ) ); 
 	
 	// housekeeping 
@@ -110,7 +109,40 @@ void create_cell_types( void )
 	
 	// add custom data 
 	cell_defaults.custom_data.add_variable( "oncoprotein" , "dimensionless", 1.0 ); 
+=======
+	/* 
+	   Put any modifications to default cell definition here if you 
+	   want to have "inherited" by other cell types. 
+	   
+	   This is a good place to set default functions. 
+	*/ 
 	
+	initialize_default_cell_definition(); 
+
+	cell_defaults.parameters.o2_proliferation_saturation = 38.0;  
+	cell_defaults.parameters.o2_reference = 38.0; 
+	
+	cell_defaults.functions.update_phenotype = tumor_cell_phenotype_with_oncoprotein;  
+	cell_defaults.functions.volume_update_function = standard_volume_update_function;
+	cell_defaults.functions.update_velocity = standard_update_cell_velocity;	
+	
+ 	/*
+	   This parses the cell definitions in the XML config file. 
+	*/
+	
+	initialize_cell_definitions_from_pugixml(); 
+	
+	/* 
+	   Put any modifications to individual cell definitions here. 
+	   
+	   This is a good place to set custom functions. 
+	*/ 
+>>>>>>> 81e85ce1dcb7156864a4460666e60878b82d3e97
+	
+	/*
+	   This builds the map of cell definitions and summarizes the setup. 
+	*/
+		
 	build_cell_definitions_maps(); 
 	display_cell_definitions( std::cout ); 
 	
@@ -119,39 +151,12 @@ void create_cell_types( void )
 
 void setup_microenvironment( void )
 {
-	// set domain parameters
-
-/* now this is in XML 
-	default_microenvironment_options.X_range = {-1000, 1000}; 
-	default_microenvironment_options.Y_range = {-1000, 1000}; 
-	default_microenvironment_options.simulate_2D = true; 
-*/
 	// make sure ot override and go back to 2D 
 	if( default_microenvironment_options.simulate_2D == true )
 	{
 		std::cout << "Warning: overriding 2D setting to return to 3D" << std::endl;
 		default_microenvironment_options.simulate_2D = false;
 	}
-	
-/*
-	All this is now in XML as of 1.6.0 
-	
-	// no gradients needed for this example 
-	
-	default_microenvironment_options.calculate_gradients = false; 
-	
-	// let BioFVM use oxygen as the default 
-	
-	default_microenvironment_options.use_oxygen_as_first_field = true; 
-	
-	// set Dirichlet conditions 
-	
-	default_microenvironment_options.outer_Dirichlet_conditions = true;
-	default_microenvironment_options.Dirichlet_condition_vector[0] = 38; // normoxic conditions 
-	
-	// set initial conditions 
-	default_microenvironment_options.initial_condition_vector = { 38.0 }; 
-*/	
 			
 	initialize_microenvironment(); 	
 
@@ -254,6 +259,9 @@ void setup_tissue( void )
 	std::cout << "mean: " << mean << std::endl; 
 	std::cout << "standard deviation: " << standard_deviation << std::endl; 
 	std::cout << "[min max]: [" << min << " " << max << "]" << std::endl << std::endl; 
+	
+	// load cells from your CSV file (if enabled)
+	load_cells_from_pugixml(); 		
 	
 	return; 
 }

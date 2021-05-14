@@ -5,11 +5,13 @@
 .project
 .settings/
 *.o
+
 unit-test-conservation.exe
 Makefile-backup
+
 *.exe
 
-.vscode/
+
 
 ./addons/PCdFBA/coin-or/
 ./addons/PCdFBA/build/*.o
