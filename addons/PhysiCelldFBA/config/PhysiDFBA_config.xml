@@ -1,0 +1,6 @@
+<intracellular type="dfba">
+    <sbml_filename>path/to/model.sbml</sbml_filename>
+    <map PC_substrate="oxygen" boundary_reaction="EX_o2_e"></map>
+    <map PC_substrate="glucose" boundary_reaction="EX_glc_e"></map>
+    <map PC_substrate="lactate" boundary_reaction="EX_lac_e"></map>
+</intracellular>
