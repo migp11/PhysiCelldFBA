@@ -46,8 +46,7 @@ $(ALL_OBJECTS): %.o: %.cpp %.h | build
 
 # create test just for libSBML
 testSBML: ./test/testSBML.cpp
-	$(COMPILE_COMMAND) -o $(BIN_DIR)/testSBML ./test/testSBML.cpp -lsbml
-# $(COMPILE_COMMAND) -L$(LIBSBML_DIR)/usr/lib64 -I$(LIBSBML_DIR)/usr/include -o $(BIN_DIR)/testSBML ./test/testSBML.cpp -lsbml
+	$(COMPILE_COMMAND) -L$(LIBSBML_DIR)/lib64 -I$(LIBSBML_DIR)/include -o $(BIN_DIR)/testSBML ./test/testSBML.cpp -lsbml
 
 # create test just for Clp
 testClp: ./test/testClp.cpp

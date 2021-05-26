@@ -19,15 +19,13 @@ def param_parser():
     return parser
 
 
-"""
-
-"""
-
 PACKAGES = ("coin-or", "libsbml")
 ARCHS = ("linux-x64", "linux-x86", "win64", "win32", "osx")
 
-def main():
+SBML_DIR = "libsbml"
+    
 
+def main():
     parser = param_parser()
     args = parser.parse_args()
 
@@ -53,32 +51,43 @@ def main():
     print("Downaling from: %s" % pkg_dict['url'])
     r = requests.get(pkg_dict['url'], allow_redirects=True)
 
-    if args.checksum:
-        print("Package cheksum(sha256)", end=" ")
-        hash_strn = hashlib.sha256(r.content).hexdigest()
-        assert pkg_dict['sha256'] == hash_strn
-        print("Ok!")
+    # if args.checksum:
+    #     print("Package cheksum(sha256)", end=" ")
+    #     hash_strn = hashlib.sha256(r.content).hexdigest()
+    #     assert pkg_dict['sha256'] == hash_strn
+    #     print("Ok!")
 
     
     fname = pkg_dict["version"]
     with open(fname, 'wb') as fh:
         fh.write(r.content)
 
-    print("Extracting package in %s... " % args.pkg, end=" ")
-    if fname.endswith("zip"):
-        archiver = zipfile.ZipFile(fname, 'r')
-        archiver.extractall()
-    elif fname.endswith("tar.gz") or fname.endswith("gz"):
-        archiver = tarfile.open(fname, "r:gz")
-        archiver.extractall()
-        old_lib_dir = os.path.commonprefix(archiver.getnames())
-        archiver.close()
-        lib_dir = "libsbml"
-        os.rename(old_lib_dir, lib_dir)
-        if os.path.exists(old_lib_dir):
-            os.rmdir(old_lib_dir)
-        os.remove(fname)
-
+    if args.pkg == 'libsbml':
+        print("Extracting package in %s... " % args.pkg, end=" ")
+        if fname.endswith("zip"):
+            archiver = zipfile.ZipFile(fname, 'r')
+            archiver.extractall()
+        elif fname.endswith("tar.gz") or fname.endswith("gz"):
+            archiver = tarfile.open(fname, "r:gz")
+            archiver.extractall()
+            old_lib_dir = os.path.commonprefix(archiver.getnames())
+            archiver.close()
+            os.rename(old_lib_dir, SBML_DIR)
+            if os.path.exists(old_lib_dir):
+                os.rmdir(old_lib_dir)
+            os.remove(fname)
+    
+    elif args.pkg == "coin-or":
+        print("Extracting package in %s... " % args.pkg, end=" ")
+        if fname.endswith("zip"):
+            archiver = zipfile.ZipFile(fname, 'r')
+            archiver.extractall()
+        elif fname.endswith("tar.gz") or fname.endswith("gz"):
+            archiver = tarfile.open(fname, "r:gz")
+            archiver.extractall(path=args.pkg)
+            archiver.close()
+            os.remove(fname)
+    
     print("Ok!")
     print("Dependency retrived correctly :-)\n")
 
