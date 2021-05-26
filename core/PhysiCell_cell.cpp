@@ -2218,7 +2218,61 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			
 			node_sec = node_sec.next_sibling( "substrate" ); 
 		}
-	}	
+	}
+
+	node = cd_node.child( "phenotype" );
+	node = node.child( "intracellular" ); 
+	if( node )
+	{
+		std::string model_type = node.attribute( "type" ).value(); 
+
+#ifdef ADDON_PHYSIDFBA
+		if (model_type == "dfba") {
+			// If it has already be copied
+			if (pParent != NULL && pParent->phenotype.intracellular != NULL) {
+				pCD->phenotype.intracellular->initialize_intracellular_from_pugixml(node);
+			// Otherwise we need to create a new one
+			} else {
+				dFBAIntracellular* pIntra = new dFBAIntracellular(node);
+				pCD->phenotype.intracellular = pIntra->getIntracellularModel();
+			}
+		}
+#endif
+
+
+#ifdef ADDON_PHYSIBOSS
+		if (model_type == "maboss") {
+			// If it has already be copied
+			if (pParent != NULL && pParent->phenotype.intracellular != NULL) {
+				pCD->phenotype.intracellular->initialize_intracellular_from_pugixml(node);
+			// Otherwise we need to create a new one
+			} else {
+				MaBoSSIntracellular* pIntra = new MaBoSSIntracellular(node);
+				pCD->phenotype.intracellular = pIntra->getIntracellularModel();
+			}
+		}
+#endif
+
+#ifdef ADDON_ROADRUNNER
+		if (model_type == "roadrunner") 
+        {
+			// If it has already be copied
+			if (pParent != NULL && pParent->phenotype.intracellular != NULL) 
+            {
+                std::cout << "------ " << __FUNCTION__ << ": copying another\n";
+				pCD->phenotype.intracellular->initialize_intracellular_from_pugixml(node);
+            }	
+			// Otherwise we need to create a new one
+			else 
+            {
+                std::cout << "\n------ " << __FUNCTION__ << ": creating new RoadRunnerIntracellular\n";
+				RoadRunnerIntracellular* pIntra = new RoadRunnerIntracellular(node);
+				pCD->phenotype.intracellular = pIntra->getIntracellularModel();
+                pCD->phenotype.intracellular->validate_PhysiCell_tokens(pCD->phenotype);
+                pCD->phenotype.intracellular->validate_SBML_species();
+			}
+		}
+#endif
 	
 	// set up custom data 
 	node = cd_node.child( "custom_data" );

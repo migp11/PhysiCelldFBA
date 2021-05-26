@@ -14,23 +14,37 @@ def param_parser():
     parser = argparse.ArgumentParser(description="")
     parser.add_argument('--pkg', dest="pkg", required=True, help='Available packages', choices=PACKAGES)
     parser.add_argument('--arch', dest="arch", required=True, choices=ARCHS, help='Current arch')
-    parser.add_argument('--checksum', dest="checksum", default=True, help='Check file integrity after downloading')
+    parser.add_argument('--checksum', dest="checksum", default=False, help='Check file integrity after downloading')
+    parser.add_argument('--path', dest='path', default='ext', help='Default folder destination to install third-party libs if changed, Makefiles you be updated according')
     return parser
 
 
-PACKAGES = ("coin-clp", )
-ARCHS = ("linux", "win64", "osx")
+"""
+
+"""
+
+PACKAGES = ("coin-or", "libsbml")
+ARCHS = ("linux-x64", "linux-x86", "win64", "win32", "osx")
 
 def main():
+
     parser = param_parser()
     args = parser.parse_args()
-    json_packages = os.path.join(os.curdir, 'etc')
+
+    json_packages = os.path.join(os.curdir, 'config')
     json_packages = os.path.join(json_packages, 'packages.json')
-    
+
     packages_dict = {}
     with open(json_packages) as fh:
         packages_dict = json.load(fh)
 
+    if not os.path.exists(args.path):
+        print("Creating %s folder" % args.path, end=" ")
+        os.makedirs(args.path)
+        print("Ok!")
+
+    print("Moving to %s folder" % args.path)
+    os.chdir(args.path)
         
     pkg_dict = packages_dict[args.pkg][args.arch]
 
@@ -39,28 +53,32 @@ def main():
     print("Downaling from: %s" % pkg_dict['url'])
     r = requests.get(pkg_dict['url'], allow_redirects=True)
 
-    print("Package cheksum(sha256)", end=" ")
-    hash_strn = hashlib.sha256(r.content).hexdigest()
-    assert pkg_dict['sha256'] == hash_strn
-    print("Ok!")
+    if args.checksum:
+        print("Package cheksum(sha256)", end=" ")
+        hash_strn = hashlib.sha256(r.content).hexdigest()
+        assert pkg_dict['sha256'] == hash_strn
+        print("Ok!")
 
-    if not os.path.exists(args.pkg):
-        print("Creating package folder")
-        os.mkdir(args.pkg)
     
-    fname = args.pkg + ".compress"
+    fname = pkg_dict["version"]
     with open(fname, 'wb') as fh:
         fh.write(r.content)
 
-    if args.arch == "win64":
-        archiver = zipfile.ZipFile(fname, 'r')
-    else:
-        archiver = tarfile.open(fname, "r:gz")
- 
     print("Extracting package in %s... " % args.pkg, end=" ")
-    archiver.extractall(path=args.pkg)
-    archiver.close()
-    os.remove(fname)
+    if fname.endswith("zip"):
+        archiver = zipfile.ZipFile(fname, 'r')
+        archiver.extractall()
+    elif fname.endswith("tar.gz") or fname.endswith("gz"):
+        archiver = tarfile.open(fname, "r:gz")
+        archiver.extractall()
+        old_lib_dir = os.path.commonprefix(archiver.getnames())
+        archiver.close()
+        lib_dir = "libsbml"
+        os.rename(old_lib_dir, lib_dir)
+        if os.path.exists(old_lib_dir):
+            os.rmdir(old_lib_dir)
+        os.remove(fname)
+
     print("Ok!")
     print("Dependency retrived correctly :-)\n")
 

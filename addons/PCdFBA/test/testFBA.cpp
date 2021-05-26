@@ -3,7 +3,6 @@
 
 #include "../src/FBA_model.h"
 
-using namespace FBA;
 using namespace std;
 
 int
