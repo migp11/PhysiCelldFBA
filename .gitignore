@@ -13,6 +13,7 @@ Makefile-backup
 
 
 
-./addons/PCdFBA/coin-or/
+./addons/PCdFBA/ext
 ./addons/PCdFBA/build/*.o
-./addons/PCdFBA/bin/*
+./addon/PCdFBA/bin/*
+
