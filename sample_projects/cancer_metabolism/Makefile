@@ -33,14 +33,17 @@ ARCH := native # best auto-tuning
 # For debugging with gdb just add: -g3 -ggdb -O3
 # -DCLP_BUILD is an additional flags to link againt clp
 # CFLAGS := -march=$(ARCH) -ggdb -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11 -DCLP_BUILD
-CFLAGS := -march=$(ARCH) -ggdb -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11 -DCLP_BUILD
+CFLAGS := -march=$(ARCH) -ggdb -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11 -pipe 
 
 
 # Libraries need: SBML and coin-Clp
-INC := -I/usr/local/include
-LIBS := -L/usr/local/lib -lClpSolver -lClp -lgfortran -lquadmath -lCoinUtils -lbz2 -lz -llapack -lblas -ldl -lm -lsbml
+DEPS_DIR = /home/mponce/.conda/envs/pc-dfba
 
-COMPILE_COMMAND := $(CC) $(CFLAGS)
+CPPFLAGS := -I$(DEPS_DIR)/include
+LDFLAGS  := -L$(DEPS_DIR)/lib
+LIBS     := -lClp -lCoinUtils -lsbml
+
+COMPILE_COMMAND := $(CC) $(CFLAGS) $(CPPFLAGS)
 
 BioFVM_OBJECTS := BioFVM_vector.o BioFVM_mesh.o BioFVM_microenvironment.o BioFVM_solvers.o BioFVM_matlab.o \
 BioFVM_utilities.o BioFVM_basic_agent.o BioFVM_MultiCellDS.o BioFVM_agent_container.o
@@ -52,9 +55,10 @@ PhysiCell_pugixml.o PhysiCell_settings.o
 
 PhysiFBA_addon_OBJECTS := PhysiFBA_metabolite.o PhysiFBA_reaction.o PhysiFBA_model.o
 
+PCdFBA_OBJECTS := dfba_intracellular.o FBA_model.o FBA_reaction.o FBA_metabolite.o
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiCell_custom_module_OBJECTS := cancer_flux_balance.o
+PhysiCell_custom_module_OBJECTS := cancer_metabolism.o
 
 pugixml_OBJECTS := pugixml.o
 

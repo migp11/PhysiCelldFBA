@@ -349,9 +349,25 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 	
 PhysiCell_basic_signaling.o: ./core/PhysiCell_basic_signaling.cpp
 	$(COMPILE_COMMAND) -c ./core/PhysiCell_basic_signaling.cpp 
-
+	
 PhysiCell_geometry.o: ./modules/PhysiCell_geometry.cpp
-	$(COMPILE_COMMAND) -c ./modules/PhysiCell_geometry.cpp 
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_geometry.cpp
+	
+
+# PhysiFBA addon modules
+
+dfba_intracellular.o: addons/PCdFBA/src/dfba_intracellular.cpp
+	$(COMPILE_COMMAND) $(CPPFLAGS) $(LDFLAGS) -c addons/PCdFBA/src/dfba_intracellular.cpp $(LIBS)
+
+FBA_model.o: addons/PCdFBA/src/FBA_model.cpp
+	$(COMPILE_COMMAND) $(CPPFLAGS) $(LDFLAGS) -c addons/PCdFBA/src/FBA_model.cpp $(LIBS)
+
+FBA_reaction.o: addons/PCdFBA/src/FBA_reaction.cpp
+	$(COMPILE_COMMAND) $(CPPFLAGS) $(LDFLAGS) -c addons/PCdFBA/src/FBA_reaction.cpp $(LIBS)
+
+FBA_metabolite.o: addons/PCdFBA/src/FBA_metabolite.cpp
+	$(COMPILE_COMMAND) $(CPPFLAGS) $(LDFLAGS) -c addons/PCdFBA/src/FBA_metabolite.cpp $(LIBS)
+
 
 # user-defined PhysiCell modules
 ecoli_acetic_switch.o: ./custom_modules/ecoli_acetic_switch.cpp
@@ -370,19 +386,22 @@ reset:
 	rm ALL_CITATIONS.txt 
 	cp ./config/PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml 
 	touch ./config/empty.csv
-	rm ./config/*.csv	
+	rm -f ./config/*.csv
 	
 clean:
 	rm -f *.o
 	rm -f $(PROGRAM_NAME)*
 
 data-cleanup:
+	# rm -f *.mat
+	# rm -f *.xml
+	# rm -f *.svg
 	rm -rf ./output
 	mkdir ./output
 	touch ./output/empty.txt
-
+	
 # archival 
-
+	
 checkpoint: 
 	zip -r $$(date +%b_%d_%Y_%H%M).zip Makefile *.cpp *.h config/*.xml custom_modules/* 
 

@@ -72,15 +72,16 @@
 #include <cmath>
 #include <omp.h>
 #include <fstream>
-#include <string>
+#include <string> 
 
 #include "./core/PhysiCell.h"
-#include "./modules/PhysiCell_standard_modules.h"
-
-// Addon module
-#include "custom_modules/cancer_flux_balance.h"
+#include "./modules/PhysiCell_standard_modules.h" 
 
 
+
+// custom user modules 
+#include "custom_modules/cancer_metabolism.h"
+	
 using namespace BioFVM;
 using namespace PhysiCell;
 
@@ -89,45 +90,47 @@ int main( int argc, char* argv[] )
 	// load and parse settings file(s)
 	
 	bool XML_status = false; 
+	char copy_command [1024]; 
 	if( argc > 1 )
-	{ XML_status = load_PhysiCell_config_file( argv[1] ); }
+	{
+		XML_status = load_PhysiCell_config_file( argv[1] ); 
+		sprintf( copy_command , "cp %s %s" , argv[1] , PhysiCell_settings.folder.c_str() ); 
+	}
 	else
-	{ XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" ); }
+	{
+		XML_status = load_PhysiCell_config_file( "./config/PhysiCell_settings.xml" );
+		sprintf( copy_command , "cp ./config/PhysiCell_settings.xml %s" , PhysiCell_settings.folder.c_str() ); 
+	}
 	if( !XML_status )
 	{ exit(-1); }
 	
+	// copy config file to output directry 
+	system( copy_command ); 
+
 	// OpenMP setup
-	std::cout << "num_threads = " << PhysiCell_settings.omp_num_threads << std::endl;
 	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
-
-
+	
 	// PNRG setup 
-	SeedRandom( parameters.ints("random_seed") );
-
+	SeedRandom(); 
+	
 	// time setup 
 	std::string time_units = "min"; 
 
-	std::cout << "Setting metabolic model" << std::endl;
-	setup_default_metabolic_model();
-	//setup_default_metabolic_model();
-
-
-	/* Microenvironment setup */
+	/* Microenvironment setup */ 
 	
-	setup_microenvironment(); // modify this in the custom code 
-	
+	setup_microenvironment(); 
+
 	/* PhysiCell setup */ 
  	
 	// set mechanics voxel size, and match the data structure to BioFVM
 	double mechanics_voxel_size = 30; 
 	Cell_Container* cell_container = create_cell_container_for_microenvironment( microenvironment, mechanics_voxel_size );
 	
+	create_cell_types();
+	setup_tissue();
+	
 	/* Users typically start modifying here. START USERMODS */ 
 	
-	create_cell_types();
-	
-	setup_tissue();
-
 	/* Users typically stop modifying here. END USERMODS */ 
 	
 	// set MultiCellDS save options 
@@ -150,10 +153,13 @@ int main( int argc, char* argv[] )
 
 	// for simplicity, set a pathology coloring function 
 	
-	std::vector<std::string> (*cell_coloring_function)(Cell*) = my_coloring_function; 
+	std::vector<std::string> (*cell_coloring_function)(Cell*) = heterogeneity_coloring_function;
 	
 	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
+	
+	sprintf( filename , "%s/legend.svg" , PhysiCell_settings.folder.c_str() ); 
+	create_plot_legend( filename , cell_coloring_function ); 	
 	
 	display_citations(); 
 	
@@ -173,11 +179,8 @@ int main( int argc, char* argv[] )
 	
 	// main loop 
 	
-	std::cout << "Unit test: conservation with individual agent substrate internalization " << std::endl 
-		<< "If this works, the total amount of each substrate should stay fixed at each output " << std::endl << std::endl ; 
-	
 	try 
-	{		
+	{	
 		while( PhysiCell_globals.current_time < PhysiCell_settings.max_time + 0.1*diffusion_dt )
 		{
 			// save data if it's time. 
@@ -229,6 +232,12 @@ int main( int argc, char* argv[] )
 			    PhysiCell::Cell* pCell = (*all_cells)[n];
 			    update_cell(pCell, pCell->phenotype, diffusion_dt);
 			  }
+			// update the microenvironment
+			microenvironment.simulate_diffusion_decay( diffusion_dt );
+			
+			// run PhysiCell 
+			((Cell_Container *)microenvironment.agent_container)->update_all_cells( PhysiCell_globals.current_time );
+			
 			PhysiCell_globals.current_time += diffusion_dt;
 		}
 		
@@ -258,3 +267,8 @@ int main( int argc, char* argv[] )
 
 	return 0; 
 }
+
+
+
+
+
