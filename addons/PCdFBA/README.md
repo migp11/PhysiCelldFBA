@@ -5,7 +5,42 @@ After unpacking coin-or run the following comand:
 
 ln ext/coin-or/include/coin-or/glpk/glpk.h ext/coin-or/include/coin-or/
 
-after compiling we need to explort 
+after compiling we need to export LD
+
+---------------------------------------------------
+
+# Install Anaconda
+wget https://repo.anaconda.com/archive/Anaconda3-2021.05-Linux-x86_64.sh
+
+chmod +x Anaconda3-2021.05-Linux-x86_64.sh 
+./Anaconda3-2021.05-Linux-x86_64.sh 
+
+export PATH=$PATH:./anaconda3/bin/
+conda init bash
+
+# create a conda environment
+conda create --name pc-devel-env
+
+# activate the conda environment
+conda activate pc-devel-env
+
+# installing libsbml
+conda install -c vincent-noel libsbml-plus-packages
+
+# installing coin-cbc MILP solver
+conda install -c conda-forge coincbc
+
+
+cd <path/to/addon>
+
+make clean
+
+g++ -Wall -std=c++11 -pipe -L/home/mponce/anaconda3/envs/pc-devel-env/lib -I/home/mponce/anaconda3/envs/pc-devel-env/include/ -o ./bin/testSBML ./test/testSBML.cpp -lsbml
+
+export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:~/anaconda3/envs/pc-devel-env/lib/
+
+./bin/testSBML test/data/Ecoli_core.xml 
+------------------------------------------------------------------------- 
 
 
 Links:

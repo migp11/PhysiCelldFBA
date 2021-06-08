@@ -70,6 +70,15 @@
 #include "PhysiCell_utilities.h"
 #include "PhysiCell_constants.h"
 #include "../BioFVM/BioFVM_vector.h" 
+
+#ifdef ADDON_PCDFBA
+#include "../addons/PCdFBA/src/dfba_intracellular.h"
+#endif
+
+#ifdef ADDON_PHYSIBOSS
+#include "../addons/PhysiBoSS/src/maboss_intracellular.h"
+#endif
+
 #include<limits.h>
 
 #include <signal.h>  // for segfault
@@ -2226,7 +2235,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 	{
 		std::string model_type = node.attribute( "type" ).value(); 
 
-#ifdef ADDON_PHYSIDFBA
+#ifdef ADDON_PCDFBA
 		if (model_type == "dfba") {
 			// If it has already be copied
 			if (pParent != NULL && pParent->phenotype.intracellular != NULL) {
@@ -2234,11 +2243,10 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 			// Otherwise we need to create a new one
 			} else {
 				dFBAIntracellular* pIntra = new dFBAIntracellular(node);
-				pCD->phenotype.intracellular = pIntra->getIntracellularModel();
+				pCD->phenotype.intracellular = pIntra->clone();
 			}
 		}
 #endif
-
 
 #ifdef ADDON_PHYSIBOSS
 		if (model_type == "maboss") {
@@ -2274,6 +2282,7 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		}
 #endif
 	
+	}
 	// set up custom data 
 	node = cd_node.child( "custom_data" );
 	pugi::xml_node node1 = node.first_child(); 

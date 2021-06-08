@@ -580,7 +580,9 @@ class Intracellular
 	
 	virtual Intracellular* clone() = 0;
     
-	
+    // ================  specific to "dfba" ================
+    virtual int update(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double dt) = 0;
+
 
     // ================  specific to "maboss" ================
 	virtual bool has_node(std::string name) = 0; 
@@ -613,8 +615,13 @@ class Phenotype
 	
 	Molecular molecular; 
 	
-	Phenotype(); // done 
+	Intracellular* intracellular;
 	
+	Phenotype(); // done 
+	Phenotype(const Phenotype &p);
+	~Phenotype();
+	Phenotype& operator=(const Phenotype &p );
+
 	void sync_to_functions( Cell_Functions& functions ); // done 
 	
 	void sync_to_microenvironment( Microenvironment* pMicroenvironment ); 

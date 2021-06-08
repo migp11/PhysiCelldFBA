@@ -26,6 +26,7 @@ for(FBA_reaction* rxn: this->reactions)
     for(FBA_metabolite* met: this->metabolites)
         delete met;
 
+    delete handler;
     delete lp_model;
 
 }
@@ -97,28 +98,40 @@ FBA_reaction* FBA_model::getReaction(std::string rId)
     return nullptr;
 }
 
+
+float FBA_model::getReactionUpperBound(std::string rId) 
+{
+    FBA_reaction* rxn = this->getReaction(rId);
+    return rxn->getUpperBound();
+}
 void FBA_model::setReactionUpperBound(std::string rId, float upperBound)
 {
-FBA_reaction* rxn = this->getReaction(rId);
-if (rxn)
+    FBA_reaction* rxn = this->getReaction(rId);
+    if (rxn)
     {
-    rxn->setUpperBound(upperBound);
-    int colIdx = this->reactionsIndexer[rId];
-    this->lp_model->setColumnUpper(colIdx, upperBound);
+        rxn->setUpperBound(upperBound);
+        int colIdx = this->reactionsIndexer[rId];
+        this->lp_model->setColumnUpper(colIdx, upperBound);
     }
+}
 
+float FBA_model::getReactionLowerBound(std::string rId) 
+{
+    FBA_reaction* rxn = this->getReaction(rId);
+    return rxn->getLowerBound();
 }
 void FBA_model::setReactionLowerBound(std::string rId, float lowerBound)
 {
-FBA_reaction* rxn = this->getReaction(rId);
-if (rxn)
+    FBA_reaction* rxn = this->getReaction(rId);
+    if (rxn)
     {
-    rxn->setLowerBound(lowerBound);
-    int colIdx = this->reactionsIndexer[rId];
-    this->lp_model->setColumnLower(colIdx, lowerBound);
+        rxn->setLowerBound(lowerBound);
+        int colIdx = this->reactionsIndexer[rId];
+        this->lp_model->setColumnLower(colIdx, lowerBound);
     }
 
 }
+
 
 void FBA_model::addReaction(FBA_reaction* rxn)
 {
@@ -142,6 +155,21 @@ const std::vector<FBA_reaction*> FBA_model::getListOfReactions() const
 {
     return this->reactions;
 }
+
+
+std::vector<FBA_reaction*> FBA_model::getListOfBoundaryReactions()
+{
+    std::vector<FBA_reaction*> listOfBoundarys;
+    for(FBA_reaction* reaction: this->reactions)
+    {
+        if (reaction->getNumberOfMetabolites() == 1)
+        {
+            listOfBoundarys.push_back(reaction);        
+        }
+    }
+    return listOfBoundarys;
+}
+
 
 std::vector<std::string> FBA_model::getListOfBoundaryReactionIds()
 {
@@ -265,6 +293,10 @@ void FBA_model::initLpModel()
     int n_cols = this->getNumReactions();
 
     this->lp_model = new ClpSimplex();
+    handler = new CoinMessageHandler(nullptr);
+    
+    handler->setLogLevel(0);
+    lp_model->passInMessageHandler(handler);
 
     CoinPackedMatrix matrix;
     matrix.setDimensions(n_rows, 0);
@@ -313,14 +345,12 @@ void FBA_model::initLpModel()
 
 void FBA_model::writeLp(const char *filename)
 {
-    this->lp_model->writeLp(filename, "lp");
+    this->lp_model->writeMps(filename);
 }
 
 void FBA_model::runFBA()
 {
-    std::cout << "Before running" << std::endl;
     this->lp_model->primal();
-    std::cout << "After running" << std::endl;
     if ( lp_model->isProvenOptimal() )
     {
         double * columnPrimal = this->lp_model->primalColumnSolution();
@@ -333,6 +363,8 @@ void FBA_model::runFBA()
     }
     else
     {
+        for(FBA_reaction* reaction: this->reactions)
+        { reaction->setFluxValue(0.0); }
         std::cout << "Primal infeasible" << std::endl;
     }
 }

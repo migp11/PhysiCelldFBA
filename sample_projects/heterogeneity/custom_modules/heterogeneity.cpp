@@ -73,43 +73,6 @@ void create_cell_types( void )
 	// set the random seed 
 	SeedRandom( parameters.ints("random_seed") );  
 	
-<<<<<<< HEAD
-	SeedRandom( parameters.ints( "random_seed" ) ); 
-	
-	// housekeeping 
-	initialize_default_cell_definition();
-	cell_defaults.phenotype.secretion.sync_to_microenvironment( &microenvironment ); 
-	
-	cell_defaults.type = 0;
-	cell_defaults.name = "tumor cell";
-
-	// turn the default cycle model to live, 
-	// so it's easier to turn off proliferation
-	
-	cell_defaults.phenotype.cycle.sync_to_cycle_model( live ); 
-
-	int cycle_start_index = live.find_phase_index( PhysiCell_constants::live ); 
-	int cycle_end_index = live.find_phase_index( PhysiCell_constants::live ); 
-	int apoptosis_index = cell_defaults.phenotype.death.find_death_model_index( PhysiCell_constants::apoptosis_death_model );
-	
-	
-	// oxygen
-	static int oxygen_ID = microenvironment.find_density_index( "oxygen" ); // 0
-	
-	cell_defaults.phenotype.secretion.secretion_rates[oxygen_ID] = 0; 
-	cell_defaults.phenotype.secretion.uptake_rates[oxygen_ID] = 10; 
-	cell_defaults.phenotype.secretion.saturation_densities[oxygen_ID] = 38; 
-
-	// set default uptake and secretion
-	cell_defaults.parameters.o2_proliferation_saturation = 38.0;
-	cell_defaults.parameters.o2_reference = 38.0;
-
-	// set the default cell type to no phenotype updates 
-	cell_defaults.functions.update_phenotype = tumor_cell_phenotype_with_oncoprotein; 
-	
-	// add custom data 
-	cell_defaults.custom_data.add_variable( "oncoprotein" , "dimensionless", 1.0 ); 
-=======
 	/* 
 	   Put any modifications to default cell definition here if you 
 	   want to have "inherited" by other cell types. 
@@ -137,7 +100,6 @@ void create_cell_types( void )
 	   
 	   This is a good place to set custom functions. 
 	*/ 
->>>>>>> 81e85ce1dcb7156864a4460666e60878b82d3e97
 	
 	/*
 	   This builds the map of cell definitions and summarizes the setup. 

@@ -79,9 +79,6 @@
 
 #include "./PhysiCell_standard_models.h" 
 
-#ifdef ADDON_PCdFBA
-#include "../addons/PCdFBA/FBA_model.h"
-#endif
 
 
 using namespace BioFVM; 
@@ -172,10 +169,6 @@ class Cell : public Basic_Agent
 
 	Cell_State state; 
 	Phenotype phenotype; 
-
-#ifdef ADDON_PCdFBA
-	FBA::FBA_model fba_model;
-#endif
 
 	void update_motility_vector( double dt_ );
 	void advance_bundled_phenotype_functions( double dt_ ); 
