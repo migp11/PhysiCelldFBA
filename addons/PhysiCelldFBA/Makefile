@@ -22,7 +22,6 @@ DEPS_DIR = /home/mponce/.conda/envs/pc-dfba
 
 CPPFLAGS  = -I$(DEPS_DIR)/include
 LDFLAGS   = -L$(DEPS_DIR)/lib
-LDFLAGS   += -L$(DEPS_DIR)/lib64
 
 # CLP_DIR = $(CUR_DIR)/ext/coin-or
 # LIBSBML_DIR = $(CUR_DIR)/ext/libsbml
@@ -73,7 +72,8 @@ $(ALL_OBJECTS): %.o: %.cpp %.h | build
 
 # create test just for libSBML
 testSBML: ./test/testSBML.cpp
-	$(COMPILE_COMMAND) $(CPPFLAGS) $(LDFLAGS) -o $(BIN_DIR)/testSBML ./test/testSBML.cpp -lsbml
+	$(COMPILE_COMMAND) -I./usr/include -L./usr/lib -o $(BIN_DIR)/testSBML ./test/testSBML.cpp -lsbml-static
+# $(COMPILE_COMMAND) $(CPPFLAGS) $(LDFLAGS) -o $(BIN_DIR)/testSBML ./test/testSBML.cpp -lsbml
 
 # create test just for Clp
 testClp: ./test/testClp.cpp
