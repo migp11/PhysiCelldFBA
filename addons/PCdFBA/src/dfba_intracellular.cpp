@@ -25,16 +25,23 @@ void dFBAIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& no
 {
 
     pugi::xml_node node_sbml = node.child( "sbml_filename" );
+
 	if ( node_sbml )
 	{ 
         this->sbml_filename = PhysiCell::xml_get_my_string_value (node_sbml);
         this->model.readSBMLModel(this->sbml_filename.c_str());
-
+        std::cout << "Loaing SBML model from: " << this->sbml_filename << std::endl;
+    }
+    else
+    {
+        std::cout << "Error: attempted get sbml_filename but not foun. " << std::endl;
+        std::cout << "Please double-check your exchange nodes in the config file." << std::endl;
+        std::cout << std::endl; 
+        exit(-1); 
     }
 	
     pugi::xml_node node_exchange = node.child( "exchange" );
-    std::cout << "HERE 2" << std::endl;
-    /*
+    
 	while( node_exchange )
 	{
         exchange_data ex_struct;
@@ -42,9 +49,9 @@ void dFBAIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& no
         kinetic_parm Vmax;
         
 
-		string density_name = node_exchange.attribute( "density" ).value(); 
+		string density_name = node_exchange.attribute( "substrate" ).value(); 
         int density_index = microenvironment.find_density_index( density_name ); 
-
+        std::cout << "Parsing " << density_name << std::endl;
         std::string actual_name = microenvironment.density_names[ density_index ]; 
 			
         // error check 
@@ -107,10 +114,8 @@ void dFBAIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& no
         ex_struct.Vmax = Vmax;
 
         this->substrate_exchanges[density_name] = ex_struct;
-        
 		node_exchange = node_exchange.next_sibling( "exchange" ); 
 	}
-    */
 }
 
 int dFBAIntracellular::dFBAIntracellular::start()

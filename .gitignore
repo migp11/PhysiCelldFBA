@@ -15,5 +15,5 @@ Makefile-backup
 
 ./addons/PCdFBA/ext
 ./addons/PCdFBA/build/*.o
-./addon/PCdFBA/bin/*
-
+./addons/PCdFBA/bin/*
+./addons/PCdFBA/usr/*

@@ -65,7 +65,7 @@ ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PCdFBA_OBJECTS) $(PhysiCell_custom_module_
 # compile the project  
 
 all: main.cpp $(ALL_OBJECTS)
-	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp -L/home/mponce/.conda/envs/pc-dfba/lib -lClp -lCoinUtils
+	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp $(LDFLAGS) $(LIBS)
 
 # PhysiCell core components	
 
@@ -170,7 +170,7 @@ FBA_metabolite.o: addons/PCdFBA/src/FBA_metabolite.cpp
 # user-defined PhysiCell modules
 
 cancer_metabolism.o: ./custom_modules/cancer_metabolism.cpp 
-	$(COMPILE_COMMAND) -c ./custom_modules/cancer_metabolism.cpp
+	$(COMPILE_COMMAND) $(CPPFLAGS) $(LDFLAGS) -c ./custom_modules/cancer_metabolism.cpp $(LIBS)
 
 # cleanup
 

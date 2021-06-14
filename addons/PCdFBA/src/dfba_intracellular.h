@@ -42,7 +42,7 @@ class dFBAIntracellular : public PhysiCell::Intracellular
  	std::map<std::string, double> parameters;
 	std::map<std::string, exchange_data> substrate_exchanges;
 
-    double next_model_run = 0;
+        double next_model_run = 0;
 
  public:
 	
@@ -63,7 +63,7 @@ class dFBAIntracellular : public PhysiCell::Intracellular
 	}
 
 	Intracellular* getIntracellularModel() 
-    {
+        {
 		return static_cast<Intracellular*>(this);
 	}
 	
@@ -81,19 +81,19 @@ class dFBAIntracellular : public PhysiCell::Intracellular
 	
 
 	// libroadrunner specifics
-      int validate_PhysiCell_tokens(PhysiCell::Phenotype& phenotype){ return true;}
-    int validate_SBML_species(){ return true;}
+        int validate_PhysiCell_tokens(PhysiCell::Phenotype& phenotype){ return true;}
+        int validate_SBML_species(){ return true;}
 	std::string get_state(){ return "none";}
 	double get_parameter_value(std::string name){ return -1; }
 	int set_parameter_value(std::string name, double value){ return -1; }
 	
-    // for now, define dummy methods for these in the abstract parent class
-    bool has_node(std::string name) { return false; }
-    bool get_boolean_node_value(std::string name) { return false; }
+        // for now, define dummy methods for these in the abstract parent class
+        bool has_node(std::string name) { return false; }
+        bool get_boolean_node_value(std::string name) { return false; }
 	void set_boolean_node_value(std::string name, bool value)  {}
-    void print_current_nodes() {}
+         void print_current_nodes() {}
 	
-    // static void save_PhysiBoSS(std::string path, std::string index);
+        // static void save_PhysiBoSS(std::string path, std::string index);
 	static void save_dFBA(std::string path, std::string index);
 };
 
