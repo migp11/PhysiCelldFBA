@@ -97,7 +97,7 @@
 	</overall>
 	
 	<parallel>
-		<omp_num_threads>8</omp_num_threads>
+		<omp_num_threads>1</omp_num_threads>
 	</parallel> 
 	
 	<save>
@@ -273,17 +273,17 @@
 					<exchange substrate="glucose">
 						<fba_flux>EX_glc_e</fba_flux>
 						<Km units="microM">1.75</Km>
-						<Vmax units="molecules/cell/seconds">197</Vmax>
+						<Vmax units="molecules/cell/seconds">1.97</Vmax>
 					</exchange>
 					<exchange substrate="oxygen">
 						<fba_flux>EX_o2_e</fba_flux>
 						<Km units="microM">1</Km>
-						<Vmax units="molecules/cell/seconds">300</Vmax>
+						<Vmax units="molecules/cell/seconds">3.00</Vmax>
 					</exchange>
 					<exchange substrate="lactate">
 						<fba_flux>EX_lac_e</fba_flux>
 						<Km units="microM">1</Km>
-						<Vmax units="molecules/cell/seconds">100</Vmax>
+						<Vmax units="molecules/cell/seconds">1.00</Vmax>
 					</exchange>
 				</intracellular>
 			

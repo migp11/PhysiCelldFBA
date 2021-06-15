@@ -96,7 +96,7 @@ int main( int argc, char* argv[] )
 	{ exit(-1); }
 	
 	// OpenMP setup
-	omp_set_num_threads(PhysiCell_settings.omp_num_threads);
+	//omp_set_num_threads(PhysiCell_settings.omp_num_threads);
 	
 	// PNRG setup 
 	SeedRandom(); 
