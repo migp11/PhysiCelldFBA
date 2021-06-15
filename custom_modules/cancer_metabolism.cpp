@@ -88,13 +88,16 @@ void create_cell_types( void )
 	
 	cell_defaults.functions.update_phenotype = update_cell;  
 	cell_defaults.functions.volume_update_function = standard_volume_update_function;
-	cell_defaults.functions.update_velocity = standard_update_cell_velocity;	
+	cell_defaults.functions.update_velocity = NULL;
+	cell_defaults.functions.update_migration_bias = NULL; 
+	cell_defaults.functions.custom_cell_rule = NULL; 
 	
  	/*
 	   This parses the cell definitions in the XML config file. 
 	*/
 	
 	initialize_cell_definitions_from_pugixml(); 
+	
 	
 	/* 
 	   Put any modifications to individual cell definitions here. 
@@ -166,8 +169,9 @@ void setup_tissue( void )
 	Cell* pCell = NULL;
 	for( int i=0; i < positions.size(); i++ )
 	{
-		pCell = create_cell(); // tumor cell
+		pCell = create_cell(get_cell_definition("metabolic cell")); // tumor cell
 		pCell->assign_position( positions[i] );
+		dFBAIntracellular *model = (dFBAIntracellular*) pCell->phenotype.intracellular;
 	}
 	
 	return; 
@@ -175,7 +179,8 @@ void setup_tissue( void )
 
 void update_cell(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double dt ){
 
-	phenotype.intracellular
+	dFBAIntracellular *model = (dFBAIntracellular*) phenotype.intracellular;
+	model->update(pCell, phenotype, dt);
   
   /*
   phenotype.volume.fluid += dt * phenotype.volume.fluid_change_rate *

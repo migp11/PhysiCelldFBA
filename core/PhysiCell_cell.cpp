@@ -554,10 +554,6 @@ Cell* Cell::divide( )
 	// child->set_phenotype( phenotype ); 
 	child->phenotype = phenotype; 
 
-#ifdef ADDON_PCdFBA
-	child->fba_model = this->fba_model;
-#endif
-	
 	return child;
 }
 
@@ -2239,9 +2235,11 @@ Cell_Definition* initialize_cell_definition_from_pugixml( pugi::xml_node cd_node
 		if (model_type == "dfba") {
 			// If it has already be copied
 			if (pParent != NULL && pParent->phenotype.intracellular != NULL) {
+				cout << "** init is" << endl;
 				pCD->phenotype.intracellular->initialize_intracellular_from_pugixml(node);
 			// Otherwise we need to create a new one
 			} else {
+				cout << "** init else" << endl;
 				dFBAIntracellular* pIntra = new dFBAIntracellular(node);
 				pCD->phenotype.intracellular = pIntra->clone();
 			}

@@ -46,7 +46,8 @@ private:
 	std::map< std::string, int> reactionsIndexer;
 
 	/** \brief Coin CLP simplex model to encode the FBA problem**/
-	ClpSimplex* lp_model;
+	ClpSimplex lp_model;
+	
 	CoinMessageHandler* handler;
 
 	bool is_initialized = false;
@@ -119,6 +120,8 @@ public:
 	
 	/** \brief Get the ClpSimplex model */
 	void initLpModel();
+
+	void initFBAmodel(const char* sbmlFileName);
 
 	/** \brief Write LP problem in MPS format */
 	void writeLp(const char *filename);

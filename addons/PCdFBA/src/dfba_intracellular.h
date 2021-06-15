@@ -42,7 +42,7 @@ class dFBAIntracellular : public PhysiCell::Intracellular
  	std::map<std::string, double> parameters;
 	std::map<std::string, exchange_data> substrate_exchanges;
 
-        double next_model_run = 0;
+    double next_model_run = 0;
 
  public:
 	

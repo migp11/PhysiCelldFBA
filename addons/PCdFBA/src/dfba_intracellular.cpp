@@ -18,6 +18,7 @@ dFBAIntracellular::dFBAIntracellular(dFBAIntracellular* copy)
     intracellular_type = copy->intracellular_type;
 	sbml_filename = copy->sbml_filename;
 	parameters = copy->parameters;
+    model = copy->model;
 }
 
 
@@ -29,8 +30,7 @@ void dFBAIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& no
 	if ( node_sbml )
 	{ 
         this->sbml_filename = PhysiCell::xml_get_my_string_value (node_sbml);
-        this->model.readSBMLModel(this->sbml_filename.c_str());
-        std::cout << "Loaing SBML model from: " << this->sbml_filename << std::endl;
+        
     }
     else
     {
@@ -116,6 +116,12 @@ void dFBAIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& no
         this->substrate_exchanges[density_name] = ex_struct;
 		node_exchange = node_exchange.next_sibling( "exchange" ); 
 	}
+
+    std::cout << "Loaing SBML model from: " << this->sbml_filename << std::endl;
+    this->model.readSBMLModel(this->sbml_filename.c_str());
+    this->model.initLpModel();
+    this->model.runFBA();
+
 }
 
 int dFBAIntracellular::dFBAIntracellular::start()
@@ -130,6 +136,7 @@ bool dFBAIntracellular::dFBAIntracellular::need_update()
 
 int dFBAIntracellular::update(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double dt)
 {
+   
     map<std::string, exchange_data>::iterator it;
     for(it = this->substrate_exchanges.begin(); it != this->substrate_exchanges.end(); it++)
     {
@@ -146,9 +153,14 @@ int dFBAIntracellular::update(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phen
         // Change sign to use as lower bound of the exchange flux
         flux_bound *= -1;
         // Updateing the lower bound of the corresponding exchange flux
+
+        std::cout << " - [" << substrate_name << "] = " << substrate_conc;
+        std::cout << " ==> " << ex_strut.fba_flux_id << " = " << flux_bound << std::endl;
+
         this->model.setReactionLowerBound(ex_strut.fba_flux_id, flux_bound);
     }
     this->model.runFBA();
+    // this->update_phenotype_parameters(phenotype);
     return 0;
 }
 
