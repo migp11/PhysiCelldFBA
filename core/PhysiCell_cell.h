@@ -79,6 +79,8 @@
 
 #include "./PhysiCell_standard_models.h" 
 
+
+
 using namespace BioFVM; 
 
 namespace PhysiCell{
@@ -167,7 +169,7 @@ class Cell : public Basic_Agent
 
 	Cell_State state; 
 	Phenotype phenotype; 
-	
+
 	void update_motility_vector( double dt_ );
 	void advance_bundled_phenotype_functions( double dt_ ); 
 	

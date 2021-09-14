@@ -1,6 +1,19 @@
 
+
+.vscode/
+.cproject
+.project
+.settings/
 *.o
+
 unit-test-conservation.exe
 Makefile-backup
+
 *.exe
-cancer_immune_3D
+
+
+
+./addons/PCdFBA/ext
+./addons/PCdFBA/build/*.o
+./addons/PCdFBA/bin/*
+./addons/PCdFBA/usr/*
