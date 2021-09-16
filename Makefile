@@ -1,5 +1,5 @@
 VERSION := $(shell grep . VERSION.txt | cut -f1 -d:)
-PROGRAM_NAME := cancer_metabolism
+PROGRAM_NAME := project
 
 CC := g++
 # CC := g++-mp-7 # typical macports compiler name
@@ -71,12 +71,45 @@ name:
 
 # sample projects 	
 list-projects:
+<<<<<<< HEAD
 	@echo "Sample projects: template biorobots-sample cancer-biorobots-sample cancer-immune-sample"
 	@echo "                 celltypes3-sample heterogeneity-sample pred-prey-farmer virus-macrophage-sample"
 	@echo "                 worm-sample interaction-sample mechano-sample rules-sample physimess-sample"
 	@echo ""
 	@echo "Sample intracellular projects: ode-energy-sample physiboss-cell-lines-sample cancer-metabolism-sample"
 	@echo ""
+=======
+	@echo "Sample projects: template2D template3D biorobots-sample cancer-biorobots-sample heterogeneity-sample"
+	@echo "                 cancer-immune-sample virus-macrophage-sample template pred-prey-farmer worm-sample"
+	@echo "                 ecoli-acetic-switch"
+
+ecoli-acetic-switch:
+	cp ./sample_projects/ecoli_acetic_switch/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/ecoli_acetic_switch/main_ecoli_acetic_switch.cpp ./main.cpp
+	cp Makefile Makefile-backup
+	cp ./sample_projects/ecoli_acetic_switch/Makefile ./
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml
+	cp ./sample_projects/ecoli_acetic_switch/config/* ./config/
+
+template2D: 
+	cp ./sample_projects/template2D/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/template2D/main-2D.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/template2D/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/template2D/config/* ./config/
+	
+template3D: 	
+	cp ./sample_projects/template3D/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/template3D/main-3D.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/template3D/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/template3D/config/* ./config/
+>>>>>>> master
 	
 template:
 	cp ./sample_projects/template/custom_modules/* ./custom_modules/
@@ -349,25 +382,9 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 	
 PhysiCell_basic_signaling.o: ./core/PhysiCell_basic_signaling.cpp
 	$(COMPILE_COMMAND) -c ./core/PhysiCell_basic_signaling.cpp 
-	
+
 PhysiCell_geometry.o: ./modules/PhysiCell_geometry.cpp
-	$(COMPILE_COMMAND) -c ./modules/PhysiCell_geometry.cpp
-	
-
-# PhysiFBA addon modules
-
-dfba_intracellular.o: addons/PCdFBA/src/dfba_intracellular.cpp
-	$(COMPILE_COMMAND) $(CPPFLAGS) $(LDFLAGS) -c addons/PCdFBA/src/dfba_intracellular.cpp $(LIBS)
-
-FBA_model.o: addons/PCdFBA/src/FBA_model.cpp
-	$(COMPILE_COMMAND) $(CPPFLAGS) $(LDFLAGS) -c addons/PCdFBA/src/FBA_model.cpp $(LIBS)
-
-FBA_reaction.o: addons/PCdFBA/src/FBA_reaction.cpp
-	$(COMPILE_COMMAND) $(CPPFLAGS) $(LDFLAGS) -c addons/PCdFBA/src/FBA_reaction.cpp $(LIBS)
-
-FBA_metabolite.o: addons/PCdFBA/src/FBA_metabolite.cpp
-	$(COMPILE_COMMAND) $(CPPFLAGS) $(LDFLAGS) -c addons/PCdFBA/src/FBA_metabolite.cpp $(LIBS)
-
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_geometry.cpp 
 
 # user-defined PhysiCell modules
 ecoli_acetic_switch.o: ./custom_modules/ecoli_acetic_switch.cpp
@@ -386,22 +403,19 @@ reset:
 	rm ALL_CITATIONS.txt 
 	cp ./config/PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml 
 	touch ./config/empty.csv
-	rm -f ./config/*.csv
+	rm ./config/*.csv	
 	
 clean:
 	rm -f *.o
 	rm -f $(PROGRAM_NAME)*
 
 data-cleanup:
-	# rm -f *.mat
-	# rm -f *.xml
-	# rm -f *.svg
 	rm -rf ./output
 	mkdir ./output
 	touch ./output/empty.txt
-	
+
 # archival 
-	
+
 checkpoint: 
 	zip -r $$(date +%b_%d_%Y_%H%M).zip Makefile *.cpp *.h config/*.xml custom_modules/* 
 
