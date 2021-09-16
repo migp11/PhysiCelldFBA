@@ -1,5 +1,5 @@
 VERSION := $(shell grep . VERSION.txt | cut -f1 -d:)
-PROGRAM_NAME := cancer_metabolism
+PROGRAM_NAME := project
 
 CC := g++
 # CC := g++-mp-7 # typical macports compiler name
@@ -21,8 +21,7 @@ ARCH := native # best auto-tuning
 # ARCH := nocona #64-bit pentium 4 or later 
 
 # CFLAGS := -march=$(ARCH) -Ofast -s -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11
-# CFLAGS := -march=$(ARCH) -Ofast -s -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11 -pipe 
-CFLAGS := -march=$(ARCH) -Ofast -s -fomit-frame-pointer -mfpmath=both -m64 -std=c++11 -pipe 
+CFLAGS := -march=$(ARCH) -O3 -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11
 
 ifeq ($(OS),Windows_NT)
 else
@@ -42,16 +41,14 @@ BioFVM_OBJECTS := BioFVM_vector.o BioFVM_mesh.o BioFVM_microenvironment.o BioFVM
 BioFVM_utilities.o BioFVM_basic_agent.o BioFVM_MultiCellDS.o BioFVM_agent_container.o 
 
 PhysiCell_core_OBJECTS := PhysiCell_phenotype.o PhysiCell_cell_container.o PhysiCell_standard_models.o \
-PhysiCell_cell.o PhysiCell_custom.o PhysiCell_utilities.o PhysiCell_constants.o PhysiCell_basic_signaling.o 
+PhysiCell_cell.o PhysiCell_custom.o PhysiCell_utilities.o PhysiCell_constants.o PhysiCell_basic_signaling.o
 
 PhysiCell_module_OBJECTS := PhysiCell_SVG.o PhysiCell_pathology.o PhysiCell_MultiCellDS.o PhysiCell_various_outputs.o \
 PhysiCell_pugixml.o PhysiCell_settings.o PhysiCell_geometry.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PCdFBA_OBJECTS := dfba_intracellular.o FBA_model.o FBA_reaction.o FBA_metabolite.o
-
-PhysiCell_custom_module_OBJECTS := cancer_metabolism.o
+PhysiCell_custom_module_OBJECTS := .o
 
 pugixml_OBJECTS := pugixml.o
 
@@ -68,11 +65,44 @@ all:
 
 # sample projects 	
 list-projects:
+<<<<<<< HEAD
 	@echo "Sample projects: template biorobots-sample cancer-biorobots-sample cancer-immune-sample"
 	@echo "                 celltypes3-sample heterogeneity-sample pred-prey-farmer virus-macrophage-sample worm-sample"
 	@echo ""
 	@echo "Sample intracellular projects: ode-energy-sample physiboss-cell-lines-sample cancer-metabolism-sample"
 	@echo ""
+=======
+	@echo "Sample projects: template2D template3D biorobots-sample cancer-biorobots-sample heterogeneity-sample"
+	@echo "                 cancer-immune-sample virus-macrophage-sample template pred-prey-farmer worm-sample"
+	@echo "                 ecoli-acetic-switch"
+
+ecoli-acetic-switch:
+	cp ./sample_projects/ecoli_acetic_switch/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/ecoli_acetic_switch/main_ecoli_acetic_switch.cpp ./main.cpp
+	cp Makefile Makefile-backup
+	cp ./sample_projects/ecoli_acetic_switch/Makefile ./
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml
+	cp ./sample_projects/ecoli_acetic_switch/config/* ./config/
+
+template2D: 
+	cp ./sample_projects/template2D/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/template2D/main-2D.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/template2D/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/template2D/config/* ./config/
+	
+template3D: 	
+	cp ./sample_projects/template3D/custom_modules/* ./custom_modules/
+	touch main.cpp && cp main.cpp main-backup.cpp
+	cp ./sample_projects/template3D/main-3D.cpp ./main.cpp 
+	cp Makefile Makefile-backup
+	cp ./sample_projects/template3D/Makefile .
+	cp ./config/PhysiCell_settings.xml ./config/PhysiCell_settings-backup.xml 
+	cp ./sample_projects/template3D/config/* ./config/
+>>>>>>> master
 	
 template:
 	cp ./sample_projects/template/custom_modules/* ./custom_modules/
@@ -209,10 +239,19 @@ physicell_test_DCIS: $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_DCIS.cpp
 physicell_test_HDS: $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_HDS.cpp 
 	$(COMPILE_COMMAND) -o test_HDS $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_HDS.cpp
 
-# compile the project  
+physicell_test_cell_cycle: $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_cell_cycle.cpp 
+	$(COMPILE_COMMAND) -o test_cycle $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_cell_cycle.cpp
 
-all: main.cpp $(ALL_OBJECTS)
-	$(COMPILE_COMMAND) -o $(PROGRAM_NAME) $(ALL_OBJECTS) main.cpp $(LDFLAGS) $(LIBS)
+PhysiCell_test_volume: $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_volume.cpp 
+	$(COMPILE_COMMAND) -o test_volume $(PhysiCell_OBJECTS) ./examples/PhysiCell_test_volume.cpp
+	
+examples: $(PhysiCell_OBJECTS) 
+	$(COMPILE_COMMAND) -o ./examples/test_mech1 ./examples/PhysiCell_test_mechanics_1.cpp $(PhysiCell_OBJECTS)
+	$(COMPILE_COMMAND) -o ./examples/test_mech2 ./examples/PhysiCell_test_mechanics_2.cpp $(PhysiCell_OBJECTS)
+	$(COMPILE_COMMAND) -o ./examples/test_DCIS ./examples/PhysiCell_test_DCIS.cpp $(PhysiCell_OBJECTS)
+	$(COMPILE_COMMAND) -o ./examples/test_HDS ./examples/PhysiCell_test_HDS.cpp $(PhysiCell_OBJECTS)
+	$(COMPILE_COMMAND) -o ./examples/test_cycle ./examples/PhysiCell_test_cell_cycle.cpp $(PhysiCell_OBJECTS)
+	$(COMPILE_COMMAND) -o ./examples/test_volume ./examples/PhysiCell_test_volume.cpp $(PhysiCell_OBJECTS)
 
 # PhysiCell core components	
 
@@ -294,30 +333,11 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 	
 PhysiCell_basic_signaling.o: ./core/PhysiCell_basic_signaling.cpp
 	$(COMPILE_COMMAND) -c ./core/PhysiCell_basic_signaling.cpp 
-	
+
 PhysiCell_geometry.o: ./modules/PhysiCell_geometry.cpp
-	$(COMPILE_COMMAND) -c ./modules/PhysiCell_geometry.cpp
-	
-
-# PhysiFBA addon modules
-
-dfba_intracellular.o: addons/PCdFBA/src/dfba_intracellular.cpp
-	$(COMPILE_COMMAND) $(CPPFLAGS) $(LDFLAGS) -c addons/PCdFBA/src/dfba_intracellular.cpp $(LIBS)
-
-FBA_model.o: addons/PCdFBA/src/FBA_model.cpp
-	$(COMPILE_COMMAND) $(CPPFLAGS) $(LDFLAGS) -c addons/PCdFBA/src/FBA_model.cpp $(LIBS)
-
-FBA_reaction.o: addons/PCdFBA/src/FBA_reaction.cpp
-	$(COMPILE_COMMAND) $(CPPFLAGS) $(LDFLAGS) -c addons/PCdFBA/src/FBA_reaction.cpp $(LIBS)
-
-FBA_metabolite.o: addons/PCdFBA/src/FBA_metabolite.cpp
-	$(COMPILE_COMMAND) $(CPPFLAGS) $(LDFLAGS) -c addons/PCdFBA/src/FBA_metabolite.cpp $(LIBS)
-
+	$(COMPILE_COMMAND) -c ./modules/PhysiCell_geometry.cpp 
 
 # user-defined PhysiCell modules
-
-cancer_metabolism.o: ./custom_modules/cancer_metabolism.cpp 
-	$(COMPILE_COMMAND) $(CPPFLAGS) $(LDFLAGS) -c ./custom_modules/cancer_metabolism.cpp $(LIBS)
 
 # cleanup
 
@@ -331,22 +351,19 @@ reset:
 	rm ALL_CITATIONS.txt 
 	cp ./config/PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml 
 	touch ./config/empty.csv
-	rm -f ./config/*.csv
+	rm ./config/*.csv	
 	
 clean:
 	rm -f *.o
 	rm -f $(PROGRAM_NAME)*
 	
 data-cleanup:
-	# rm -f *.mat
-	# rm -f *.xml
-	# rm -f *.svg
 	rm -rf ./output
 	mkdir ./output
 	touch ./output/empty.txt
-	
+
 # archival 
-	
+
 checkpoint: 
 	zip -r $$(date +%b_%d_%Y_%H%M).zip Makefile *.cpp *.h config/*.xml custom_modules/* 
 	
