@@ -139,7 +139,22 @@ bool dFBAIntracellular::dFBAIntracellular::need_update()
 
 void dFBAIntracellular::update(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double dt)
 {
-   
+    bool debug = false;
+
+    /*
+        Steps for the update
+        1- Update exchange fluxes lower bound using current concentrations
+        2- run FBA and check growth threshold
+        3- update the cell volumne using the growth rate from FBA
+        4- rescale exchange fluxes from the dfba model and use them to update the net_export_rates
+        5- remove the internalized substrates if needed
+
+        mM /gDW cell / h <-- fluxes uints
+        Biomass: 
+
+    */
+
+    // Setp 1 - Update exchange fluxes lower
     map<std::string, exchange_data>::iterator it;
     for(it = this->substrate_exchanges.begin(); it != this->substrate_exchanges.end(); it++)
     {
@@ -151,54 +166,101 @@ void dFBAIntracellular::update(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phe
         
         // geting the amount of substrate
         double substrate_conc = pCell->nearest_density_vector()[ex_strut.density_index];
+
+        // PROBLEM TO SOLVE
+        // having substrate_conc in the proper units that match FBA
+
         // useing irreversible Michaelis Menten kinetics to estimate the flux bound
         double flux_bound = (Vmax * substrate_conc) / (Km + substrate_conc); // should be calculated from density
         // Change sign to use as lower bound of the exchange flux
         flux_bound *= -1;
         // Updateing the lower bound of the corresponding exchange flux
-
-        std::cout << " - [" << substrate_name << "] = " << substrate_conc;
-        std::cout << " ==> " << ex_strut.fba_flux_id << " = " << flux_bound << std::endl;
-
-        this->model.setReactionLowerBound(ex_strut.fba_flux_id, flux_bound);
+        this->model.setReactionLowerBound(ex_strut.fba_flux_id, flux_bound);    
+        
+        if ( debug ) {
+            std::cout << " - [" << substrate_name << "] = " << substrate_conc;
+            std::cout << " ==> " << ex_strut.fba_flux_id << " = " << flux_bound << std::endl;
+        }
     }
+
+    // STEP 2 - run FBA
     this->model.runFBA();
-    // this->update_phenotype_parameters(phenotype);
-    // return 0;
-}
 
-int dFBAIntracellular::update_phenotype_parameters(PhysiCell::Phenotype& phenotype)
-{
-    /*
-        Required steps for the update
-
-        1- rescale exchange fluxes from the dfba model
-        2- update the net_export_rates using the rescaled exchanges
-        3- remove the internalized substrates if needed
-        4- update the cell volumne using the growth rate from FBA
-        5- if no-growth check non-growth associated mantainanace to update apoptotic rate
-    */
-
+    // STEP 3 - 
+    float growth_rate = this->model.getObjectiveValue();
+    
+    // V(t+1) = V(t) + V(t) * u * dt = V(t) * (1 + u * dt)
+    // growth_rate 1/h
+    float volume_increase_ratio = 1 + (growth_rate / 60) * dt
+    phenotype.volume.multiply_by_ratio( volume_increase_ratio );
+    
+    
+    // STEPS 4-5
     map<std::string, exchange_data>::iterator it;
     for(it = this->substrate_exchanges.begin(); it != this->substrate_exchanges.end(); it++)
     {
         std::string substrate_name = it->first;
         exchange_data ex_strut = it->second;
         
+        int density_index = ex_strut.density_index;
         std::string fba_flux_id = ex_strut.fba_flux_id;
-        FBA_reaction* exchange = this->model.getReaction(fba_flux_id);
-        double flux = exchange->getFluxValue();
         
-        // how to rescale FBA exchanges into net_export_rates
-        float scaling = 1;
-        flux *= scaling;
-        phenotype.secretion.net_export_rates[ex_strut.density_index] = flux;
-    }
+        FBA_reaction* exchange = this->model.getReaction(fba_flux_id);
+        // flux units: mmol / gDW cell / h
+        double flux = exchange->getFluxValue();
+        flux *= -1;
+        
+        // voxel volumne = 8000 um³ = 0.8e-11 L
+        // FLUXES Units: mmol / gDW cell / hr
+        // µm3 = 1 fL = 1e−15 L
+        // MULTIPLYER (hr) --> * (dt/60)
 
-    float delta_vol = 1;
-    float growth_rate = 1; //
-    phenotype.volume.total; // FBA predicts growth rate mu
-    phenotype.volume.multiply_by_ratio(delta_vol);
+        // HeLa cell mass 2.3 ng
+        // cell_density --> 1.04 g/ml = 1.04 ug/nL = 1.04 ng / pL = 0.00104 ng / fL
+        // cell volume fL (um³)
+        
+        // cell.mass.total (ng) = cell.volume (um³) * cell.density (ng / um³)
+        // ~2.6 (ng) = ~2500 (um³) * ~0.00104 ng / (um³)
+        
+        // gDW cell (cell.volume.total * cell_density) = mass.total
+        // cell.mass.solid = cell.mass.total * (1-fluid_frac)
+
+        // MULTIPLYER (gDW cell) --> * cell.mass.solid (ng DW cell)
+        
+        
+        // mmol / per_gDW_per_hr 
+        
+        // 
+        // mM: mmol / L
+        // how to rescale FBA exchanges into net_export_rates
+        // ml = 1e+12 um³
+        // g = 1e+12 pg
+        // cell density (from HeLa) g / ml = pg / um³
+        
+        float cell_density = 1.04;
+        float solid_fraction = (1 - phenotype.volume.fluid_fraction) ;
+        // dry wight units: pg
+        float dry_weight = (phenotype.volume.total * cell_density) * solid_fraction
+        float scaling = 1;
+        
+        float net_export_rate = flux * dry_weight * dt
+        
+        flux *= scaling;
+        phenotype.secretion.net_export_rates[density_index] = flux;
+
+        // STEP 4 - setting internalized total substrate to 0
+        phenotype.molecular.internalized_total_substrates[density_index] = 0;
+
+        
+    }
+    
+
+
+}
+
+int dFBAIntracellular::update_phenotype_parameters(PhysiCell::Phenotype& phenotype)
+{
+
 
     return 0;
 }
