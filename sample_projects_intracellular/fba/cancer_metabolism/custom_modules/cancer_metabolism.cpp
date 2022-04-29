@@ -71,7 +71,7 @@
 
 Cell_Definition motile_cell; 
 
-void create_cell_types( void )
+void create_cell_types(void)
 {
 	// use the same random seed so that future experiments have the 
 	// same initial histogram of oncoprotein, even if threading means 
@@ -166,7 +166,7 @@ void create_cell_types( void )
 	return; 
 }
 
-void setup_microenvironment( void )
+void setup_microenvironment(void)
 {
 	// set domain parameters 
 	
@@ -210,33 +210,7 @@ void setup_microenvironment( void )
 	return; 
 }
 
-std::vector<std::vector<double>> create_cell_disc_positions(double cell_radius, double disc_radius)
-{
-	std::vector<std::vector<double>> cells;
-	int xc=0,yc=0,zc=0;
-	double x_spacing= cell_radius*sqrt(3);
-	double y_spacing= cell_radius*2;
-	double z_spacing= cell_radius*sqrt(3);
-
-	std::vector<double> tempPoint(3,0.0);
-	double z = 0;
-	for(double x=-sphere_radius;x<sphere_radius;x+=x_spacing, xc++)
-	{
-		for(double y=-sphere_radius;y<sphere_radius;y+=y_spacing, yc++)
-		{
-			tempPoint[0]=x + (zc%2) * 0.5 * cell_radius;
-			tempPoint[1]=y + (xc%2) * cell_radius;
-			tempPoint[2]=z;
-
-			if(sqrt(norm_squared(tempPoint))< sphere_radius)
-			{ cells.push_back(tempPoint); }
-		}
-	}
-	return cells;
-
-}
-
-void setup_tissue( void )
+void setup_tissue(void)
 {
 	// create some cells near the origin
 	
@@ -259,6 +233,88 @@ void setup_tissue( void )
 	return; 
 }
 
+
+std::vector<std::vector<double>> create_cell_sphere_positions(double cell_radius, double sphere_radius)
+{
+	std::vector<std::vector<double>> cells;
+	int xc=0,yc=0,zc=0;
+	double x_spacing= cell_radius*sqrt(3);
+	double y_spacing= cell_radius*2;
+	double z_spacing= cell_radius*sqrt(3);
+	
+	std::vector<double> tempPoint(3,0.0);
+	// std::vector<double> cylinder_center(3,0.0);
+	
+	for(double z=-sphere_radius;z<sphere_radius;z+=z_spacing, zc++)
+	{
+		for(double x=-sphere_radius;x<sphere_radius;x+=x_spacing, xc++)
+		{
+			for(double y=-sphere_radius;y<sphere_radius;y+=y_spacing, yc++)
+			{
+				tempPoint[0]=x + (zc%2) * 0.5 * cell_radius;
+				tempPoint[1]=y + (xc%2) * cell_radius;
+				tempPoint[2]=z;
+				
+				if(sqrt(norm_squared(tempPoint))< sphere_radius)
+				{ cells.push_back(tempPoint); }
+			}
+			
+		}
+	}
+	return cells;
+	
+}
+
+
+std::vector<std::vector<double>> create_cell_disc_positions(double cell_radius, double disc_radius)
+{	 
+	double cell_spacing = 0.95 * 2.0 * cell_radius; 
+	
+	double x = 0.0; 
+	double y = 0.0; 
+	double x_outer = 0.0;
+
+	std::vector<std::vector<double>> positions;
+	std::vector<double> tempPoint(3,0.0);
+	
+	int n = 0; 
+	while( y < disc_radius )
+	{
+		x = 0.0; 
+		if( n % 2 == 1 )
+		{ x = 0.5 * cell_spacing; }
+		x_outer = sqrt( disc_radius*disc_radius - y*y ); 
+		
+		while( x < x_outer )
+		{
+			tempPoint[0]= x; tempPoint[1]= y;	tempPoint[2]= 0.0;
+			positions.push_back(tempPoint);			
+			if( fabs( y ) > 0.01 )
+			{
+				tempPoint[0]= x; tempPoint[1]= -y;	tempPoint[2]= 0.0;
+				positions.push_back(tempPoint);
+			}
+			if( fabs( x ) > 0.01 )
+			{ 
+				tempPoint[0]= -x; tempPoint[1]= y;	tempPoint[2]= 0.0;
+				positions.push_back(tempPoint);
+				if( fabs( y ) > 0.01 )
+				{
+					tempPoint[0]= -x; tempPoint[1]= -y;	tempPoint[2]= 0.0;
+					positions.push_back(tempPoint);
+				}
+			}
+			x += cell_spacing; 
+		}		
+		y += cell_spacing * sqrt(3.0)/2.0; 
+		n++; 
+	}
+	return positions;
+}
+
+
+
+
 std::vector<std::string> my_coloring_function( Cell* pCell )
 {
 	// start with flow cytometry coloring 
@@ -275,52 +331,51 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 }
 
 
+
 std::vector<std::string> metabolic_coloring_function( Cell* pCell )
 {
-	dFBAIntracellular *model = (dFBAIntracellular*) phenotype.intracellular;
+	// dFBAIntracellular *model = (dFBAIntracellular*) phenotype.intracellular;
 
-	static int oncoprotein_i = pCell->custom_data.find_variable_index( "oncoprotein" ); 
+	// static int oncoprotein_i = model->get
 	
-	static double p_min = parameters.doubles( "oncoprotein_min" ); 
-	static double p_max = parameters.doubles( "oncoprotein_max" ); 
+	// static double o2_min = 0;
+	// static double o2_max = 1;
 	
-	// immune are black
-	std::vector< std::string > output( 4, "black" ); 
 	
-	if( pCell->type == 1 )
-	{ return output; } 
+	// std::vector< std::string > output( 4, "black" ); 
 	
-	// live cells are green, but shaded by oncoprotein value 
-	if( pCell->phenotype.death.dead == false )
-	{
-		int oncoprotein = (int) round( (1.0/(p_max-p_min)) * (pCell->custom_data[oncoprotein_i]-p_min) * 255.0 ); 
-		char szTempString [128];
-		sprintf( szTempString , "rgb(%u,%u,%u)", oncoprotein, oncoprotein, 255-oncoprotein );
-		output[0].assign( szTempString );
-		output[1].assign( szTempString );
+	// if( pCell->type == 1 )
+	// { return output; } 
+	
+	// // live cells are green, but shaded by oncoprotein value 
+	// if( pCell->phenotype.death.dead == false )
+	// {
+	// 	int respiration = (int) round( (1.0/(o2_max-o2_min)) * (pCell->custom_data[oncoprotein_i]-p_min) * 255.0 ); 
+	// 	char szTempString [128];
+	// 	sprintf( szTempString , "rgb(%u,%u,%u)", oncoprotein, oncoprotein, 255-oncoprotein );
+	// 	output[0].assign( szTempString );
+	// 	output[1].assign( szTempString );
 
-		sprintf( szTempString , "rgb(%u,%u,%u)", (int)round(output[0][0]/p_max) , (int)round(output[0][1]/p_max) , (int)round(output[0][2]/p_max) );
-		output[2].assign( szTempString );
+	// 	sprintf( szTempString , "rgb(%u,%u,%u)", (int)round(output[0][0]/p_max) , (int)round(output[0][1]/p_max) , (int)round(output[0][2]/p_max) );
+	// 	output[2].assign( szTempString );
 		
-		return output; 
-	}
+	// 	return output; 
+	// }
 
-	// if not, dead colors 
+	/*
+    if(value > 0.5){
+        value -= 0.5;
+        rgb[0] = 0;
+        rgb[1] = (int)((1-2*value)*255);
+        rgb[2] = (int)(2*value*255);
+    }
+    if(value <= 0.5){
+        rgb[0] = (int)((1-2*value)*255);
+        rgb[1] = (int)(2*value*255);
+        rgb[2] = 0;
+    }*/
 	
-	if (pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::apoptotic )  // Apoptotic - Red
-	{
-		output[0] = "rgb(255,0,0)";
-		output[2] = "rgb(125,0,0)";
-	}
 	
-	// Necrotic - Brown
-	if( pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic_swelling || 
-		pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic_lysed || 
-		pCell->phenotype.cycle.current_phase().code == PhysiCell_constants::necrotic )
-	{
-		output[0] = "rgb(250,138,38)";
-		output[2] = "rgb(139,69,19)";
-	}	
 	
 	return output; 
 }

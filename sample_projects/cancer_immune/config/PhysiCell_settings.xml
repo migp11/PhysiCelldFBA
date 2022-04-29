@@ -200,12 +200,7 @@
 						<!-- necrosis uses phase_duration[0] = 0 so that it always immediately
 							 tries to transition and instead checks volume against the rupture
 							 volume --> 
-<!--						
-						<phase_transition_rates units="1/min">
-							<rate start_index="0" end_index="1" fixed_duration="false">9e9</rate>
-							<rate start_index="1" end_index="2" fixed_duration="true">1.15741e-5</rate>
-						</phase_transition_rates>
--->						
+
 						<phase_durations units="min">
 							<duration index="0" fixed_duration="true">0</duration>
 							<duration index="1" fixed_duration="true">86400</duration>

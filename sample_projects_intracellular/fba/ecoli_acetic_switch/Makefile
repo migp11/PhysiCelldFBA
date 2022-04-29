@@ -2,11 +2,8 @@ VERSION := $(shell grep . VERSION.txt | cut -f1 -d:)
 PROGRAM_NAME := ecoli-dfba
 
 CC := g++
-# CC := g++-mp-7 # typical macports compiler name
-# CC := g++-7 # typical homebrew compiler name
 
 # Check for environment definitions of compiler
-# e.g., on CC = g++-7 on OSX
 ifdef PHYSICELL_CPP
 	CC := $(PHYSICELL_CPP)
 endif
@@ -14,90 +11,27 @@ endif
 ARCH := native # best auto-tuning
 # ARCH := core2 # a reasonably safe default for most CPUs since 2007
 # ARCH := corei7
-# ARCH := corei7-avx # earlier i7
-# ARCH := core-avx-i # i7 ivy bridge or newer
-# ARCH := core-avx2 # i7 with Haswell or newer
-# ARCH := nehalem
-# ARCH := westmere
-# ARCH := sandybridge # circa 2011
-# ARCH := ivybridge   # circa 2012
-# ARCH := haswell     # circa 2013
-# ARCH := broadwell   # circa 2014
-# ARCH := skylake     # circa 2015
-# ARCH := bonnell
-# ARCH := silvermont
-# ARCH := skylake-avx512
-# ARCH := nocona #64-bit pentium 4 or later
-
 
 # For debugging with gdb just add: -g3 -ggdb -O3
 # -DCLP_BUILD is an additional flags to link againt clp
 # CFLAGS := -march=$(ARCH) -ggdb -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11 -DCLP_BUILD
-CFLAGS := -march=$(ARCH) -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11 -DCLP_BUILD
-
+CFLAGS := -march=$(ARCH) -O3 -fomit-frame-pointer -mfpmath=both -fopenmp -m64 -std=c++11 -pipe  -D ADDON_PHYSIDFBA
 
 # Libraries need: SBML and coin-Clp
+DEPS_DIR = ./addons/dFBA/ext
 
-CLP_FOLDER := ./addons/coin-clp
+DEPS_CFLAGS := -I$(DEPS_DIR)/libsbml/include -I$(DEPS_DIR)/coin-or/include
+LD_PATH  := -L$(DEPS_DIR)/libsbml/lib -L$(DEPS_DIR)/coin-or/lib/
+LIBS     := -lClp-static -lCoinUtils-static -llapack -lsbml-static -lxml2 -lbz2 -lz
 
-
-INC := -I/usr/local/include -DADDON_PHYSIDFBA -I$(CLP_FOLDER)/include -I$(CLP_FOLDER)/include/coin-or/glpk
-LIBS := -L/usr/local/lib -L$(CLP_FOLDER)/lib -ldl -lm -lClp -lCoinUtils -lcoinasl -lcoinglpk -lcoinmumps -lsbml
-
-OSFLAG 	:=
+# if we're on Windows, we need to provide a (agreed upon) path to some of the dynamic libs
 ifeq ($(OS),Windows_NT)
-	OSFLAG += -D WIN32
-	OMP_LIB := 
-#	LIBFBA_DIR := C:\Users\heiland\libroadrunner\roadrunner-win64-vs14-cp35m
-#	LIBFBA_LIBS := C:\Users\heiland\libroadrunner\roadrunner-win64-vs14-cp35m/bin
-#	LIBFBA_CFLAGS := -I${LIBFBA_DIR}/include/rr/C
-	CFLAGS := -march=$(ARCH) -fomit-frame-pointer -fopenmp -m64 -std=c++11 -D ADDON_PHYSIDFBA
-	ifeq ($(PROCESSOR_ARCHITECTURE),AMD64)
-		OSFLAG += -D AMD64
-	endif
-	ifeq ($(PROCESSOR_ARCHITECTURE),x86)
-		OSFLAG += -D IA32
-	endif
+	WIN_LD_FLAG := -LC:\msys64\mingw64\bin
 else
-	UNAME_S := $(shell uname -s)
-	ifeq ($(UNAME_S),Linux)
-		OSFLAG += -D LINUX
-		OMP_LIB :=
-#		LIBFBA_DIR := $(HOME)/libroadrunner/libroadrunner
-#		LIBFBA_DIR := $(shell pwd)/intracellular_libs/roadrunner
-#		LIBFBA_CFLAGS := -I${LIBFBA_DIR}/include/rr/C
-		LIBFBA_LIBS := ${LIBFBA_DIR}/lib
-		# CFLAGS := -march=$(ARCH) -g  -fomit-frame-pointer -fopenmp -m64 -std=c++11 -D ADDON_PHYSIDFBA 
-		CFLAGS := -march=$(ARCH) -fomit-frame-pointer -m64 -std=c++11 -D ADDON_PHYSIDFBA  
-	endif
-	ifeq ($(UNAME_S),Darwin)
-#		CC := clang++
-		OSFLAG += -D OSX
-#	 	LIBFBA_DIR := $(HOME)/libroadrunner/roadrunner-osx-10.9-cp36m
-#		LIBFBA_DIR := $(shell pwd)/intracellular_libs/roadrunner
-		LIBFBA_DIR := ./addons/dFBA
-#		LIBFBA_CFLAGS := -I${LIBFBA_DIR}/include/rr/C
-#		LIBFBA_CFLAGS := -I${LIBFBA_DIR}/include/rr/C
-#		LIBFBA_CFLAGS := -I${LIBFBA_DIR}/coin-or/include/coin-or
-		LIBFBA_CFLAGS := -I${LIBFBA_DIR}/coin-or/include
-		LIBFBA_LIBS := ${LIBFBA_DIR}/lib/coin-or/lib
-	endif
-		UNAME_P := $(shell uname -p)
-	ifeq ($(UNAME_P),x86_64)
-		OSFLAG += -D AMD64
-#		LIBFBA_DIR := $(HOME)/libroadrunner/libroadrunner
-#		LIBFBA_CFLAGS := -I${LIBFBA_DIR}/include/rr/C
-		CFLAGS := -march=$(ARCH) -fomit-frame-pointer -fopenmp -m64 -std=c++11 -D ADDON_PHYSIDFBA  
-	endif
-		ifneq ($(filter %86,$(UNAME_P)),)
-	OSFLAG += -D IA32
-		endif
-	ifneq ($(filter arm%,$(UNAME_P)),)
-		OSFLAG += -D ARM
-	endif
+	WIN_LD_FLAG := 
 endif
 
-COMPILE_COMMAND := $(CC) $(CFLAGS) $(LIBFBA_CFLAGS)
+COMPILE_COMMAND := $(CC) $(CFLAGS) $(DEPS_CFLAGS)
 
 BioFVM_OBJECTS := BioFVM_vector.o BioFVM_mesh.o BioFVM_microenvironment.o BioFVM_solvers.o BioFVM_matlab.o \
 BioFVM_utilities.o BioFVM_basic_agent.o BioFVM_MultiCellDS.o BioFVM_agent_container.o
@@ -109,8 +43,9 @@ PhysiCell_signal_behavior.o PhysiCell_rules.o
 PhysiCell_module_OBJECTS := PhysiCell_SVG.o PhysiCell_pathology.o PhysiCell_MultiCellDS.o PhysiCell_various_outputs.o \
 PhysiCell_pugixml.o PhysiCell_settings.o  PhysiCell_geometry.o
 
-FBA_addon_OBJECTS := FBA_metabolite.o FBA_reaction.o FBA_model.o
+PhysiFBA_addon_OBJECTS := PhysiFBA_intracellular.o PhysiFBA_metabolite.o PhysiFBA_reaction.o PhysiFBA_model.o
 
+PCdFBA_OBJECTS := PhysiFBA_intracellular.o FBA_model.o FBA_reaction.o FBA_metabolite.o
 # put your custom objects here (they should be in the custom_modules directory)
 
 PhysiCell_custom_module_OBJECTS := custom.o
@@ -118,7 +53,8 @@ PhysiCell_custom_module_OBJECTS := custom.o
 pugixml_OBJECTS := pugixml.o
 
 PhysiCell_OBJECTS := $(BioFVM_OBJECTS)  $(pugixml_OBJECTS) $(PhysiCell_core_OBJECTS) $(PhysiCell_module_OBJECTS)
-ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiCell_custom_module_OBJECTS) $(FBA_addon_OBJECTS) 
+ALL_OBJECTS := $(PhysiCell_OBJECTS) $(PhysiFBA_addon_OBJECTS) $(PhysiCell_custom_module_OBJECTS)
+
 
 # compile the project
 
@@ -225,8 +161,7 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 
 # user-defined PhysiCell modules
 
-# dFBA addon modules
-
+# PhysiFBA addon modules
 libFBA: 
 ifeq ($(OS), Windows_NT)
 	python beta/setup_coin_clp.py
@@ -257,15 +192,16 @@ custom.o: ./custom_modules/custom.cpp
 # cleanup
 
 reset:
-	rm -f *.cpp
-	cp ./sample_projects/Makefile-default Makefile
+	rm -f *.cpp 
+	cp ./sample_projects/Makefile-default Makefile 
 	rm -f ./custom_modules/*
-	touch ./custom_modules/empty.txt
-	touch ALL_CITATIONS.txt
+	touch ./custom_modules/empty.txt 
+	touch ALL_CITATIONS.txt 
 	touch ./core/PhysiCell_cell.cpp
-	rm ALL_CITATIONS.txt
-	cp ./config/PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml
-	touch ./config/empty.txt
+	rm ALL_CITATIONS.txt 
+	cp ./config/PhysiCell_settings-backup.xml ./config/PhysiCell_settings.xml 
+	touch ./config/empty.csv
+	rm ./config/*.csv	
 
 clean:
 	rm -f *.o
