@@ -358,6 +358,7 @@ void FBA_model::writeLp(const char *filename)
 void FBA_model::runFBA()
 {
     std::cout << "Running FBA... ";
+    
     this->lp_model.primal();
     if ( lp_model.isProvenOptimal() )
     {

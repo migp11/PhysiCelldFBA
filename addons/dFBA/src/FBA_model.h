@@ -28,7 +28,7 @@ LIBSBML_CPP_NAMESPACE_USE
 
 class FBA_model
 {
-private:
+	private:
 	/** \brief Constraint-Based Model Class to perform FBA*/
 
 	std::string id;
