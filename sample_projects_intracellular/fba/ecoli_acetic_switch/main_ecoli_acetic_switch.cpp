@@ -121,10 +121,10 @@ int main( int argc, char* argv[] )
 	create_cell_types();
 	setup_tissue();
 
-	/* Users typically stop modifying here. END USERMODS */ 
+	float next_dFBA_time = 0;
+	float dFBA_time_interval = 1;
 
-	std::cout << "Setting metabolic model" << std::endl;
-	setup_default_metabolic_model();
+	/* Users typically stop modifying here. END USERMODS */ 
 	
 	// set MultiCellDS save options 
 
@@ -217,11 +217,16 @@ int main( int argc, char* argv[] )
 			/*
 			  Custom add-ons could potentially go here. 
 			*/
-			for(int n=0; n < all_cells->size(); n++)
+			
+			if( fabs( PhysiCell_globals.current_time - next_dFBA_time ) < 0.01 * diffusion_dt ){
+				for(int n=0; n < all_cells->size(); n++)
 			  {
 			    PhysiCell::Cell* pCell = (*all_cells)[n];
 			    update_cell(pCell, pCell->phenotype, diffusion_dt);
 			  }
+			  next_dFBA_time += dFBA_time_interval;
+			}
+			
 			PhysiCell_globals.current_time += diffusion_dt;
 		}
 		

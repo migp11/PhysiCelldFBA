@@ -101,3 +101,9 @@ void update_cell(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double
 void metabolic_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt );
 
 std::vector<std::string> my_coloring_function( Cell* );
+
+// helper function to create a sphere of cells of a given radius
+std::vector<std::vector<double>> create_cell_sphere_positions(double cell_radius, double sphere_radius);
+
+// helper function to create a disc of cells of a given radius
+std::vector<std::vector<double>> create_cell_disc_positions(double cell_radius, double disc_radius);
