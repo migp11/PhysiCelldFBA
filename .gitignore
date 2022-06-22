@@ -1,4 +1,5 @@
 *.o
+<<<<<<< HEAD
 *.exe
 .DS_Store
 Makefile-backup
@@ -29,3 +30,18 @@ Makefile-backup
 ./addons/PCdFBA/build/*.o
 ./addons/PCdFBA/bin/*
 ./addons/PCdFBA/usr/*
+=======
+*.exe
+.DS_Store
+Makefile-backup
+config/PhysiCell_settings-backup.xml
+documentation/.DS_Store
+unit_tests/.DS_Store
+sample_projects/.DS_Store
+sample_projects/biorobots/.DS_Store
+sample_projects/cancer_biorobots/.DS_Store
+sample_projects/cancer_immune/.DS_Store
+sample_projects/celltypes3/.DS_Store
+sample_projects/heterogeneity/.DS_Store
+sample_projects/template/.DS_Store
+>>>>>>> bedcb3ac09d431240d8a9c726f86058e8cc85bbd
