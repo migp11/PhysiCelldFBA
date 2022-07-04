@@ -29,3 +29,6 @@ Makefile-backup
 ./addons/PCdFBA/build/*.o
 ./addons/PCdFBA/bin/*
 ./addons/PCdFBA/usr/*
+
+
+.venv
