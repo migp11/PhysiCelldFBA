@@ -16,12 +16,9 @@ dFBAIntracellular::dFBAIntracellular(pugi::xml_node& node)
 dFBAIntracellular::dFBAIntracellular(dFBAIntracellular* copy) 
 {
     intracellular_type = copy->intracellular_type;
-	sbml_filename = copy->sbml_filename;
-	parameters = copy->parameters;
-    // model = copy->model;
-    model.readSBMLModel(copy->sbml_filename.c_str());
-    model.initLpModel();
-    model.runFBA();
+    sbml_filename = copy->sbml_filename;
+    parameters = copy->parameters;
+    model.initFBAmodel(copy->sbml_filename.c_str());
 }
 
 
@@ -129,7 +126,7 @@ void dFBAIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& no
 
 void dFBAIntracellular::dFBAIntracellular::start()
 {
-    // return 0;
+    return;
 }
 
 bool dFBAIntracellular::dFBAIntracellular::need_update()
@@ -151,12 +148,14 @@ void dFBAIntracellular::update(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phe
         Biomass: 
 
     */
-
-    bool debug = true;
     
+    static float pi = PhysiCell::PhysiCell_constants::pi;
+    bool debug = true;
+
     // HeLa cell mass 2.3 ng
     // cell volume fL (um³)
-    // mM: mmol / L = 10⁻³ mol / 1e-15 um³ = pmol / um³
+    // mM: mmol / L = 10⁻³ mol / 1e¹⁵ um³ = 10⁻¹⁵mol / um³ = amol /  um³
+    // ml = 1e+12 um³
     // ml = 1e+12 um³
     // g = 1e+12 pg
     // g / ml = pg / um³
@@ -167,10 +166,24 @@ void dFBAIntracellular::update(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phe
         
     // gDW cell (cell.volume.total * cell_density) = mass.total
     // cell.mass.solid = cell.mass.total * (1-fluid_frac)
+   
 
-    static float cell_density = 1.04; // pg / um³
-    static float solid_fraction = (1 - phenotype.volume.fluid_fraction); // unitless
-    float cell_dry_weight = (phenotype.volume.total * solid_fraction) * cell_density ; // um³ * pg / um³ = pg
+    static float cell_density = 1.04;                             // pg / um³
+    float solid_fraction = 1 - phenotype.volume.fluid_fraction;   // unitless ~30%
+    float solid_volume = phenotype.volume.total * solid_fraction; // um³
+    float cell_dry_weight = solid_volume * cell_density ;         // um³ * pg / um³ = pg
+    cell_dry_weight = cell_dry_weight * 1E3;                      // fg
+
+    // r = (3V / 4π))^1/3
+    float radius = cbrt( (3./4. * pi * phenotype.volume.total) ); // um
+    float cell_surface = 4 * pi * pow(radius, 2);                 // um
+
+    // Km: mM = mmol/L = ammol/um³
+    // sdt: surf_density_of_transport
+    // kcat: 
+    // Vmax = kcat * sdt * cell_surface
+
+
 
     std::vector<double> density_vector = pCell->nearest_density_vector(); // 
 
@@ -192,7 +205,15 @@ void dFBAIntracellular::update(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phe
         // PROBLEM TO SOLVE
         // having substrate_conc in the proper units that match FBA
 
-        // useing irreversible Michaelis Menten kinetics to estimate the flux bound
+        // Standard FBA fluxes units:  mmol /  gDW cell / h
+        // this can be expressed as:  ammol / fgDW cell / h
+        // Km: mM = mmol/L = ammol/um³
+        // sdt: surf_density_of_transport
+        // A
+        // Vmax = kcat * sdt * Ac
+        
+        
+        // using irreversible Michaelis Menten kinetics to estimate the flux bound
         double flux_bound = cell_dry_weight * (Vmax * density) / (Km + density); // should be calculated from density
         // Change sign to use as lower bound of the exchange flux
         flux_bound *= -1;
@@ -218,6 +239,8 @@ void dFBAIntracellular::update(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phe
     float volume_increase_ratio = 1 + growth_rate * dt;
     phenotype.volume.multiply_by_ratio( volume_increase_ratio );
     phenotype.geometry.update(pCell, phenotype, dt);
+
+    phenotype.volume.ra
 
     
     // STEPS 4-5 - Update net_export_rates for the different densities
