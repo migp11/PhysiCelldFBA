@@ -32,7 +32,6 @@ struct exchange_data
 	kinetic_parm Vmax;
 };
 
-
 class dFBAIntracellular : public PhysiCell::Intracellular 
 {
  private:

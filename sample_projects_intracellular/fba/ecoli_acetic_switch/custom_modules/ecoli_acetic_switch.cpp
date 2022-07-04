@@ -119,6 +119,7 @@ void setup_tissue(void)
 	return; 
 }
 
+
 void update_cell(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double dt ){
 
 	dFBAIntracellular *model = (dFBAIntracellular*) phenotype.intracellular;
@@ -229,8 +230,6 @@ std::vector<std::vector<double>> create_cell_disc_positions(double cell_radius, 
 }
 
 
-
-
 std::vector<std::string> my_coloring_function( Cell* pCell )
 {
 
@@ -249,17 +248,8 @@ std::vector<std::string> my_coloring_function( Cell* pCell )
 }
 
 
-
 std::vector<std::string> metabolic_coloring_function( Cell* pCell )
 {
-	// dFBAIntracellular *model = (dFBAIntracellular*) phenotype.intracellular;
-
-	// static int oncoprotein_i = model->get
-	
-	// static double o2_min = 0;
-	// static double o2_max = 1;
-	
-	
 	std::vector< std::string > output( 4, "black" ); 
 	
 	// if( pCell->type == 1 )
