@@ -36,7 +36,7 @@ class dFBAIntracellular : public PhysiCell::Intracellular
 {
  private:
     std::string sbml_filename;
-	FBA_model model;
+	FBA_model fba_model;
 
  	std::map<std::string, double> parameters;
 	std::map<std::string, exchange_data> substrate_exchanges;
@@ -65,7 +65,12 @@ class dFBAIntracellular : public PhysiCell::Intracellular
 	{
 		return static_cast<Intracellular*>(this);
 	}
-	
+
+	FBA_model* getFBAmodel()
+	{
+		return this->fba_model;
+	}
+
 	void initialize_intracellular_from_pugixml(pugi::xml_node& node);
 	
     void start();

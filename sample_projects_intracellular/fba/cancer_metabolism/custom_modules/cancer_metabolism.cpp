@@ -80,20 +80,8 @@ void create_cell_types(void)
 
 	initialize_cell_definitions_from_pugixml();
 
-	if (parameters.bools("update_pc_parameters_O2_based"))
-	{ cell_defaults.functions.update_phenotype = tumor_cell_phenotype_with_signaling; }
-	else
-	{ cell_defaults.functions.update_phenotype = tnf_bm_interface_main; }
+	cell_defaults.functions.update_phenotype = update_metabolic_phenotype;
 
-	/*  This initializes the the TNF receptor model	*/
-	tnf_receptor_model_setup();
-	tnf_boolean_model_interface_setup();
-	submodel_registry.display(std::cout);
-
-	// Needs to initialize one of the receptor state to the total receptor value
-	cell_defaults.custom_data["unbound_external_TNFR"] = cell_defaults.custom_data["TNFR_receptors_per_cell"];
-	cell_defaults.custom_data["bound_external_TNFR"] = 0;
-	cell_defaults.custom_data["bound_internal_TNFR"] = 0;
 
 	build_cell_definitions_maps();
 	display_cell_definitions(std::cout);
@@ -130,13 +118,13 @@ void setup_tissue(void)
 	return; 
 }
 
-void update_cell(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double dt ){
+void update_metabolic_phenotype(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double dt ){
 
-	dFBAIntracellular *model = (dFBAIntracellular*) phenotype.intracellular;
-	model->update(pCell, phenotype, dt);
+	dFBAIntracellular *dfba = (dFBAIntracellular*) phenotype.intracellular;
+	dfba->update(pCell, phenotype, dt);
 	
 	if (phenotype.volume.total	>= 4500 ){
-		pCell->divide()
+		pCell->divide();
 	}
   
 }
