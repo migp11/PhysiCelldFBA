@@ -80,20 +80,7 @@ void create_cell_types(void)
 
 	initialize_cell_definitions_from_pugixml();
 
-	if (parameters.bools("update_pc_parameters_O2_based"))
-	{ cell_defaults.functions.update_phenotype = tumor_cell_phenotype_with_signaling; }
-	else
-	{ cell_defaults.functions.update_phenotype = tnf_bm_interface_main; }
-
-	/*  This initializes the the TNF receptor model	*/
-	tnf_receptor_model_setup();
-	tnf_boolean_model_interface_setup();
-	submodel_registry.display(std::cout);
-
-	// Needs to initialize one of the receptor state to the total receptor value
-	cell_defaults.custom_data["unbound_external_TNFR"] = cell_defaults.custom_data["TNFR_receptors_per_cell"];
-	cell_defaults.custom_data["bound_external_TNFR"] = 0;
-	cell_defaults.custom_data["bound_internal_TNFR"] = 0;
+	cell_defaults.functions.update_phenotype = metabolic_cell_phenotype;
 
 	build_cell_definitions_maps();
 	display_cell_definitions(std::cout);
@@ -130,17 +117,6 @@ void setup_tissue(void)
 	return; 
 }
 
-void update_cell(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double dt ){
-
-	dFBAIntracellular *model = (dFBAIntracellular*) phenotype.intracellular;
-	model->update(pCell, phenotype, dt);
-	
-	if (phenotype.volume.total	>= 4500 ){
-		pCell->divide()
-	}
-  
-}
-
 
 void metabolic_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 {
@@ -157,6 +133,16 @@ void metabolic_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt )
 
 	//static int oncoprotein_i = pCell->custom_data.find_variable_index( "oncoprotein" );
 	//phenotype.cycle.data.transition_rate( cycle_start_index ,cycle_end_index ) *= pCell->custom_data[oncoprotein_i] ;
+	
+	dFBAIntracellular *model = (dFBAIntracellular*) phenotype.intracellular;
+	model->update(pCell, phenotype, dt);
+	
+	if (phenotype.volume.total	>= 4500 ){
+		pCell->divide();
+	}
+
+
+
 	return;
 }
 
@@ -240,30 +226,14 @@ std::vector<std::vector<double>> create_cell_disc_positions(double cell_radius, 
 }
 
 
-
-
-std::vector<std::string> my_coloring_function( Cell* pCell )
+std::vector<std::string> metabolic_coloring_function( Cell* pCell )
 {
 
 	std::vector<std::string> output = false_cell_coloring_cytometry(pCell);
 	output[0] = "red";
 	output[1] = "red";
 	output[2] = "red";
-
-	if( pCell->phenotype.death.dead == false && pCell->type == 1 )
-	{
-		 output[0] = "black";
-		 output[2] = "black";
-	}
-
-	return output;
-}
-
-
-
-std::vector<std::string> metabolic_coloring_function( Cell* pCell )
-{
-	// dFBAIntracellular *model = (dFBAIntracellular*) phenotype.intracellular;
+	dFBAIntracellular *model = (dFBAIntracellular*) pCell->phenotype.intracellular;
 
 	// static int oncoprotein_i = model->get
 	

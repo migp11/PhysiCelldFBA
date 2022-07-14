@@ -1,9 +1,9 @@
 #include <iostream>
 #include <string>
 
-#include <coin-or/CoinPackedMatrix.hpp>
-#include <coin-or/CoinPackedVector.hpp>
-#include <coin-or/ClpSimplex.hpp>
+#include <coin/CoinPackedMatrix.hpp>
+#include <coin/CoinPackedVector.hpp>
+#include <coin/ClpSimplex.hpp>
 
 using namespace std;
 
@@ -72,7 +72,7 @@ int main()
     lp_model->loadProblem(matrix, col_lb, col_ub, objective, row_lb, row_ub);
     lp_model->setOptimizationDirection(z_sense);
     
-    const char* filename = "test/test_problem";
+    const char* filename = "data/test_problem";
     std::cout << "- Saving problem in lp format in " << filename << std::endl;
     lp_model->writeLp(filename, "lp");
 

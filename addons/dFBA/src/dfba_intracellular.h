@@ -44,7 +44,6 @@ class dFBAIntracellular : public PhysiCell::Intracellular
     double next_model_run = 0;
 
  public:
-	
 
     dFBAIntracellular();
 
@@ -77,6 +76,7 @@ class dFBAIntracellular : public PhysiCell::Intracellular
 	void update(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double dt);
     
 	int update_phenotype_parameters(PhysiCell::Phenotype& phenotype);
+	
 	bool has_variable(std::string name) { return true; }
 
 	// libroadrunner specifics
@@ -95,6 +95,10 @@ class dFBAIntracellular : public PhysiCell::Intracellular
 	
 	// static void save_PhysiBoSS(std::string path, std::string index);
 	static void save_dFBA(std::string path, std::string index);
+
+	void *update_volume(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double growth_rate, double dt);
+
+	void standard_update_cell_volume(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double growth_rate, double dt);
 };
 
 
