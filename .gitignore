@@ -25,10 +25,8 @@ Makefile-backup
 
 *.exe
 
-./addons/PCdFBA/ext
-./addons/PCdFBA/build/*.o
-./addons/PCdFBA/bin/*
-./addons/PCdFBA/usr/*
-
-
+./addons/dFBA/ext
+./addons/dFBA/ext/*
+./addons/dFBA/test/*.o
+./addons/dFBA/test/test_*
 .venv
