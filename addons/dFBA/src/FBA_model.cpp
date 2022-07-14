@@ -15,25 +15,29 @@ FBA_model FBA_default_model;
 FBA_model::FBA_model()
 {
     this->id = "None";
-    //this->lp_model = nullptr;
     this->is_initialized = false;
+    this->handler = NULL;
+    this->solution = NULL;
 }
 
 FBA_model::~FBA_model() {
-for(FBA_reaction* rxn: this->reactions)
-        delete rxn;
+    for(FBA_reaction* rxn: this->reactions)
+            delete rxn;
 
-    for(FBA_metabolite* met: this->metabolites)
-        delete met;
+        for(FBA_metabolite* met: this->metabolites)
+            delete met;
 
-//    delete handler;
-//    delete lp_model;
+    if (this->handler != NULL)
+        delete handler;
+
+        if (this->solution != NULL)
+        delete solution;
 
 }
 
 const ClpSimplex* FBA_model::getLpModel() const
 {
-    return &this->lp_model;
+    return &this->problem;
 }
 
 const int FBA_model::getNumReactions()
@@ -104,6 +108,7 @@ float FBA_model::getReactionUpperBound(std::string rId)
     FBA_reaction* rxn = this->getReaction(rId);
     return rxn->getUpperBound();
 }
+
 void FBA_model::setReactionUpperBound(std::string rId, float upperBound)
 {
     FBA_reaction* rxn = this->getReaction(rId);
@@ -111,7 +116,7 @@ void FBA_model::setReactionUpperBound(std::string rId, float upperBound)
     {
         rxn->setUpperBound(upperBound);
         int colIdx = this->reactionsIndexer[rId];
-        this->lp_model.setColumnUpper(colIdx, upperBound);
+        this->problem.setColumnUpper(colIdx, upperBound);
     }
 }
 
@@ -120,6 +125,7 @@ float FBA_model::getReactionLowerBound(std::string rId)
     FBA_reaction* rxn = this->getReaction(rId);
     return rxn->getLowerBound();
 }
+
 void FBA_model::setReactionLowerBound(std::string rId, float lowerBound)
 {
     FBA_reaction* rxn = this->getReaction(rId);
@@ -127,11 +133,10 @@ void FBA_model::setReactionLowerBound(std::string rId, float lowerBound)
     {
         rxn->setLowerBound(lowerBound);
         int colIdx = this->reactionsIndexer[rId];
-        this->lp_model.setColumnLower(colIdx, lowerBound);
+        this->problem.setColumnLower(colIdx, lowerBound);
     }
 
 }
-
 
 void FBA_model::addReaction(FBA_reaction* rxn)
 {
@@ -150,12 +155,10 @@ const int FBA_model::getReactionIndex(std::string rId)
         return -1;
 }
 
-
 const std::vector<FBA_reaction*> FBA_model::getListOfReactions() const
 {
     return this->reactions;
 }
-
 
 std::vector<FBA_reaction*> FBA_model::getListOfBoundaryReactions()
 {
@@ -169,7 +172,6 @@ std::vector<FBA_reaction*> FBA_model::getListOfBoundaryReactions()
     }
     return listOfBoundarys;
 }
-
 
 std::vector<std::string> FBA_model::getListOfBoundaryReactionIds()
 {
@@ -286,17 +288,16 @@ void FBA_model::readSBMLModel(const char* sbmlFileName)
     delete document;
 }
 
-void FBA_model::initLpModel()
+void FBA_model::initProblem()
 {
 
     int n_rows = this->getNumMetabolites();
     int n_cols = this->getNumReactions();
 
-    //this->lp_model = new ClpSimplex();
     handler = new CoinMessageHandler(nullptr);
     
     handler->setLogLevel(0);
-    lp_model.passInMessageHandler(handler);
+    problem.passInMessageHandler(handler);
 
     CoinPackedMatrix matrix;
     matrix.setDimensions(n_rows, 0);
@@ -331,8 +332,8 @@ void FBA_model::initLpModel()
         matrix.appendCol(col);
     }
 
-    this->lp_model.loadProblem(matrix, col_lb, col_ub, objective, row_lb, row_ub);
-    this->lp_model.setOptimizationDirection(-1);
+    this->problem.loadProblem(matrix, col_lb, col_ub, objective, row_lb, row_ub);
+    this->problem.setOptimizationDirection(-1);
 
     delete col_lb;
     delete col_ub;
@@ -343,47 +344,65 @@ void FBA_model::initLpModel()
     this->is_initialized = true;
 }
 
-void FBA_model::initFBAmodel(const char* sbmlFileName)
+void FBA_model::initModel(const char* sbmlFileName)
 {
     this->readSBMLModel(sbmlFileName);
-    this->initLpModel();
+    this->initProblem();
 
 }
 
-void FBA_model::writeLp(const char *filename)
+void FBA_model::writeProblem(const char *filename)
 {
-    this->lp_model.writeMps(filename);
+    this->problem.writeLp(filename);
 }
 
-void FBA_model::runFBA()
+FBA_solution* FBA_model::optimize()
 {
-    std::cout << "Running FBA... ";
+    // std::cout << "Running FBA... ";
     
-    this->lp_model.primal();
-    if ( lp_model.isProvenOptimal() )
+    this->problem.primal();
+    if ( problem.isProvenOptimal() )
     {
-        double * columnPrimal = this->lp_model.primalColumnSolution();
-        std::cout << "Optimal solution found!" << std::endl;
+        const double *columnPrimal = this->problem.getColSolution();
+        std::map<std::string,float> fluxes;
+        std::map<std::string,float> reduced_costs;
+
+        std::string status;
+
+        double fopt =  problem.getObjValue();
+        
+        if (problem.status() == 0){
+            status = "optimal";
+        }
+        else if (problem.status() == 1){
+            status = "infeasible";
+        }
+        else{
+            status = "unknown";
+        }
+        
         for(FBA_reaction* reaction: this->reactions)
         {
-            int idx = this->reactionsIndexer[reaction->getId()];
-            double v = columnPrimal[idx];
-            reaction->setFluxValue(v);
+            int column_idx = this->reactionsIndexer[reaction->getId()];
+            double flux = columnPrimal[column_idx];
+            fluxes[reaction->getId()] = flux;
+            reaction->setFluxValue(flux);
         }
+
+        this->solution = new FBA_solution(fopt, status, fluxes);
     }
     else
     {
         for(FBA_reaction* reaction: this->reactions)
         { reaction->setFluxValue(0.0); }
-        std::cout << "Primal infeasible" << std::endl;
     }
-    
+    return this->solution;
 }
 
 bool FBA_model::getSolutionStatus()
 {
     if (this->is_initialized)
-        return this->lp_model.isProvenOptimal();
+        return this->problem.isProvenOptimal();
     else
         return false;
 }
@@ -391,8 +410,8 @@ bool FBA_model::getSolutionStatus()
 float FBA_model::getObjectiveValue()
 {
     assert(this->is_initialized);
-    if (this->lp_model.isProvenOptimal())
-        return this->lp_model.getObjValue();
+    if (this->problem.isProvenOptimal())
+        return this->problem.getObjValue();
     else
         std::cout << "WARNING: Primal infeasible" << std::endl;
     return 0;

@@ -23,117 +23,127 @@
 
 #include "FBA_metabolite.h"
 #include "FBA_reaction.h"
+#include "FBA_solution.h"
 
 LIBSBML_CPP_NAMESPACE_USE
 
 class FBA_model
 {
 	private:
-	/** \brief Constraint-Based Model Class to perform FBA*/
+		/** \brief Constraint-Based Model Class to perform FBA*/
 
-	std::string id;
+		std::string id;
 
-	/** \brief vector of reaction objects*/
-	std::vector<FBA_metabolite*> metabolites;
+		/** \brief vector of reaction objects*/
+		std::vector<FBA_metabolite*> metabolites;
 
-	/** \brief map between metabolites' ids and metabolites' references **/
-	std::map<std::string, int> metaboliteIndexer;
+		/** \brief map between metabolites' ids and metabolites' references **/
+		std::map<std::string, int> metaboliteIndexer;
 
-	/** \brief vector of reaction objects*/
-	std::vector<FBA_reaction*> reactions;
+		/** \brief vector of reaction objects*/
+		std::vector<FBA_reaction*> reactions;
 
-	/** \brief map between reaction IDs and reaction references */
-	std::map< std::string, int> reactionsIndexer;
+		/** \brief map between reaction IDs and reaction references */
+		std::map< std::string, int> reactionsIndexer;
 
-	/** \brief Coin CLP simplex model to encode the FBA problem**/
-	ClpSimplex lp_model;
-	
-	CoinMessageHandler* handler;
+		/** \brief solution  */
+		FBA_solution* solution;
 
-	bool is_initialized = false;
+		/** \brief Coin CLP simplex model to encode the FBA problem**/
+		ClpSimplex problem;
+		
+		CoinMessageHandler* handler;
 
-public:
+		bool is_initialized = false;
 
-	/** \brief Constructor */
-	FBA_model();
+	public:
 
-	/** \brief Destructor */
-	~FBA_model();
+		/** \brief Constructor */
+		FBA_model();
 
-	/** \brief Check if there is a metaboltie with a given ID*/
-	bool hasMetabolite(std::string mId);
+		/** \brief Destructor */
+		~FBA_model();
 
-	/** \brief a metabolite pointer using a string Id*/
-	const FBA_metabolite* getMetabolite(std::string mId);
+		/** \brief Check if there is a metaboltie with a given ID*/
+		bool hasMetabolite(std::string mId);
 
-	/** \brief Add new metabolite to the model*/
-	void addMetabolite(FBA_metabolite* met);
+		/** \brief a metabolite pointer using a string Id*/
+		const FBA_metabolite* getMetabolite(std::string mId);
 
-	
-	/** \brief Check if there is a reaction with a given ID*/
-	bool hasReaction(std::string rId);
-	
-	/** \brief Get a reaction pointer using string ID*/
-	FBA_reaction* getReaction(std::string rId);
+		/** \brief Add new metabolite to the model*/
+		void addMetabolite(FBA_metabolite* met);
 
-	/** \brief Add new reaction to the model*/
-	void addReaction(FBA_reaction* rxn);
+		
+		/** \brief Check if there is a reaction with a given ID*/
+		bool hasReaction(std::string rId);
+		
+		/** \brief Get a reaction pointer using string ID*/
+		FBA_reaction* getReaction(std::string rId);
 
-	/** \brief Get the integer index of a reaction*/
-	const int getReactionIndex(std::string rId);
-	
-	/** \brief Get the upper bound of a reactions*/
-	float getReactionUpperBound(std::string rId);
-	
-	/** \brief Set the upper bound of a reactions*/
-	void setReactionUpperBound(std::string rId, float upperBound);
-	
-	/** \brief Get the upper bound of a reactions*/
-	float getReactionLowerBound(std::string rId);
-	
-	/** \brief Set the lower bound of a reactions*/
-	void setReactionLowerBound(std::string rId, float lowerBound);
+		/** \brief Add new reaction to the model*/
+		void addReaction(FBA_reaction* rxn);
 
-	/** \brief Get the number of model reactions*/
-	const int getNumReactions();
+		/** \brief Get the integer index of a reaction*/
+		const int getReactionIndex(std::string rId);
+		
+		/** \brief Get the upper bound of a reactions*/
+		float getReactionUpperBound(std::string rId);
+		
+		/** \brief Set the upper bound of a reactions*/
+		void setReactionUpperBound(std::string rId, float upperBound);
+		
+		/** \brief Get the upper bound of a reactions*/
+		float getReactionLowerBound(std::string rId);
+		
+		/** \brief Set the lower bound of a reactions*/
+		void setReactionLowerBound(std::string rId, float lowerBound);
 
-	/** \brief Get the number of model metabolites*/
-	const int getNumMetabolites();
+		/** \brief Get the number of model reactions*/
+		const int getNumReactions();
 
-	/** \brief Get a metabolite pointer using s string Id*/
-	const std::vector<FBA_metabolite*> getListOfMetabolites() const;
+		/** \brief Get the number of model metabolites*/
+		const int getNumMetabolites();
 
-	/** \brief Get the list of reaction pointers*/
-	const std::vector<FBA_reaction*> getListOfReactions() const;
+		/** \brief Get a metabolite pointer using s string Id*/
+		const std::vector<FBA_metabolite*> getListOfMetabolites() const;
 
 		/** \brief Get the list of reaction pointers*/
-	std::vector<FBA_reaction*> getListOfBoundaryReactions();
+		const std::vector<FBA_reaction*> getListOfReactions() const;
 
-	/** \brief Get the list of IDs of the boundary reactions*/
-	std::vector<std::string> getListOfBoundaryReactionIds();
+			/** \brief Get the list of reaction pointers*/
+		std::vector<FBA_reaction*> getListOfBoundaryReactions();
 
-	/** \brief Get the ClpSimplex model */
-	const ClpSimplex* getLpModel() const;
+		/** \brief Get the list of IDs of the boundary reactions*/
+		std::vector<std::string> getListOfBoundaryReactionIds();
 
-	/** \brief Parse and read a metabolic model from a SBML file*/
-	void readSBMLModel(const char* sbmlFileName);
-	
-	/** \brief Get the ClpSimplex model */
-	void initLpModel();
+		/** \brief Get the ClpSimplex model */
+		const ClpSimplex* getLpModel() const;
 
-	void initFBAmodel(const char* sbmlFileName);
+		/** \brief Parse and read a metabolic model from a SBML file*/
+		void readSBMLModel(const char* sbmlFileName);
+		
+		/** \brief Initialize the ClpSimplex model */
+		void initProblem();
 
-	/** \brief Write LP problem in MPS format */
-	void writeLp(const char *filename);
+		/** \brief Initialize the CBM model and the LP problem */
+		void initModel(const char* sbmlFileName);
 
-	/** \brief Run FBA using primal method */
-	void runFBA();
+		/** \brief Write problem in LP format */
+		void writeProblem(const char *filename);
 
-	/** \brief Get solution status */
-	bool getSolutionStatus();
+		/** \brief Run FBA using primal method */
+		FBA_solution* optimize();
 
-	/** \brief Get objective value */
-	float getObjectiveValue();
+		/** \brief Get solution status */
+		std::string getId() { return this->id; };
+
+		/** \brief Get solution status */
+		bool getSolutionStatus();
+
+		/** \brief Get objective value */
+		float getObjectiveValue();
+
+		FBA_solution* getSolution(){ return this->solution; }
 };
 
 

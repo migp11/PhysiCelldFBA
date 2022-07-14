@@ -7,13 +7,6 @@
 
 #include "FBA_reaction.h"
 
-#include <iostream>
-#include <vector>
-#include <map>
-
-#include "FBA_metabolite.h"
-
-
 
 FBA_reaction::FBA_reaction(std::string id)
 {

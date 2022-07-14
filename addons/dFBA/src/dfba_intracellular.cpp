@@ -18,7 +18,7 @@ dFBAIntracellular::dFBAIntracellular(dFBAIntracellular* copy)
     intracellular_type = copy->intracellular_type;
     sbml_filename = copy->sbml_filename;
     parameters = copy->parameters;
-    model.initFBAmodel(copy->sbml_filename.c_str());
+    model.initModel(copy->sbml_filename.c_str());
 }
 
 
@@ -119,8 +119,8 @@ void dFBAIntracellular::initialize_intracellular_from_pugixml(pugi::xml_node& no
 
     std::cout << "Loaing SBML model from: " << this->sbml_filename << std::endl;
     this->model.readSBMLModel(this->sbml_filename.c_str());
-    this->model.initLpModel();
-    this->model.runFBA();
+    this->model.initProblem();
+    this->model.optimize();
 
 }
 
@@ -208,10 +208,12 @@ void dFBAIntracellular::update(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phe
     static float hours_to_minutes = 1/60;
 
     // STEP 2 - run FBA
-    this->model.runFBA();
+    FBA_solution *solution = this->model.optimize();
+    
 
     // STEP 3 - Update cell volumen using growth rate (first rscale growth rate to 1/min)
-    float growth_rate = this->model.getObjectiveValue();
+    float growth_rate = solution->getObjectiveValue();
+    
     growth_rate = growth_rate * hours_to_minutes; // growth_rate 1/h -> 1/min
     
     // V(t+1) = V(t) + V(t) * mu * dt = V(t) * (1 + u * dt) 
