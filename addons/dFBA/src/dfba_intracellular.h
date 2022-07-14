@@ -64,7 +64,12 @@ class dFBAIntracellular : public PhysiCell::Intracellular
 	{
 		return static_cast<Intracellular*>(this);
 	}
-	
+
+	FBA_model* getFBAmodel()
+	{
+		return this->model;
+	}
+
 	void initialize_intracellular_from_pugixml(pugi::xml_node& node);
 	
     void start();

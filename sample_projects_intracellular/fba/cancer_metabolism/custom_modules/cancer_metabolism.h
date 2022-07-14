@@ -87,18 +87,12 @@ void setup_tissue( void );
 // set up the BioFVM microenvironment
 void setup_microenvironment( void );
 
-
 // custom pathology coloring function
 
-std::vector<double> integrate_total_substrates( void );
 
-void anuclear_volume_model (Cell* pCell, Phenotype& phenotype, double dt);
+void custom_volume_model (Cell* pCell, Phenotype& phenotype, double dt);
 
-void setup_default_metabolic_model( void );
-
-void update_cell(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double dt );
-
-void metabolic_cell_phenotype( Cell* pCell, Phenotype& phenotype, double dt );
+void update_metabolic_phenotype( Cell* pCell, Phenotype& phenotype, double dt );
 
 std::vector<std::string> metabolic_coloring_function( Cell* );
 
