@@ -14,10 +14,17 @@ CFLAGS      := -march=$(ARCH) -O3 -fomit-frame-pointer -mfpmath=both -fopenmp -m
 DEPS_DIR    := ../ext
 DEPS_CFLAGS := -I$(DEPS_DIR)/libsbml/include -I$(DEPS_DIR)/coin-or/include -I../src
 LD_PATH     := -L$(DEPS_DIR)/libsbml/lib -L$(DEPS_DIR)/coin-or/lib/
+# sudo apt install libbz2-dev
+# sudo apt install libxml2-dev
+
+## "linux-x64", "linux-x86", "win64", "win32", "osx"
+PKG_ARCH := linux-x64
+
 LIBS        := -lClp-static -lCoinUtils-static -llapack -lsbml-static -lxml2 -lbz2 -lz
 
 ifeq ($(OS),Windows_NT)
 	WIN_LD_FLAG := -LC:\msys64\mingw64\bin
+	ARCH := win64
 else
 	WIN_LD_FLAG := 
 	UNAME_S := $(shell uname -s)
@@ -38,8 +45,8 @@ vpath %.o     $(SRC_DIR)
 vpath %.cpp   $(SRC_DIR) 
 vpath %.h     $(SRC_DIR) 
 
-ALL_OBJECTS := FBA_metabolite.o FBA_reaction.o FBA_solution.o FBA_model.o
-
+ALL_OBJECTS := dfba_Metabolite.o dfba_Reaction.o dfba_Solution.o dfba_Model.o dfba_intracellular.o
+# ALL_OBJECTS := dfba_Metabolite.o dfba_Reaction.o dfba_Solution.o dfba_Model.o 
 
 make_lib: libFBA $(ALL_OBJECTS)
 all: make_lib test_sbml test_clp test_fba
@@ -65,23 +72,23 @@ test_fba: libFBA $(ALL_OBJECTS) ./main_test_fba.cpp
 
 # FBA addon modules
 libFBA: 
-	python ../../../beta/setup_fba.py --pkg libsbml
-	python ../../../beta/setup_fba.py --pkg coin-or
+	python3 ../../../beta/setup_fba.py --pkg libsbml --arch $(PKG_ARCH)
+	python3 ../../../beta/setup_fba.py --pkg coin-or --arch $(PKG_ARCH)
 
-FBA_intracellular.o: ../src/dfba_intracellular.cpp
-	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ../src/dfba_intracellular.cpp -o ./FBA_intracellular.o
+dfba_intracellular.o: ../src/dfba_intracellular.cpp
+	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ../src/dfba_intracellular.cpp -o ./dfba_intracellular.o
 
-FBA_model.o: ../src/FBA_model.cpp
-	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ../src/FBA_model.cpp -o ./FBA_model.o
+dfba_Model.o: ../src/dfba_Model.cpp
+	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ../src/dfba_Model.cpp -o ./dfba_Model.o
 
-FBA_reaction.o: ../src/FBA_reaction.cpp
-	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ../src/FBA_reaction.cpp -o ./FBA_reaction.o
+dfba_Reaction.o: ../src/dfba_Reaction.cpp
+	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ../src/dfba_Reaction.cpp -o ./dfba_Reaction.o
 
-FBA_metabolite.o: ../src/FBA_metabolite.cpp
-	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ../src/FBA_metabolite.cpp -o ./FBA_metabolite.o
+dfba_Metabolite.o: ../src/dfba_Metabolite.cpp
+	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ../src/dfba_Metabolite.cpp -o ./dfba_Metabolite.o
 
-FBA_solution.o: ../src/FBA_solution.cpp
-	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ../src/FBA_solution.cpp -o ./FBA_solution.o
+dfba_Solution.o: ../src/dfba_Solution.cpp
+	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ../src/dfba_Solution.cpp -o ./dfba_Solution.o
 
 
 clean:
