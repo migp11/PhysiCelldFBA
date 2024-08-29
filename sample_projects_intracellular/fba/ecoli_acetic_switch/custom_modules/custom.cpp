@@ -65,9 +65,34 @@
 ###############################################################################
 */
 
-#include "ecoli_acetic_switch.h"
+#include "custom.h"
 
-#include "../modules/PhysiCell_settings.h"
+
+void create_cell_types(void)
+{
+	SeedRandom(parameters.ints("random_seed"));
+
+	initialize_default_cell_definition();
+
+	/*  This parses the cell definitions in the XML config file.  */
+	initialize_cell_definitions_from_pugixml();
+
+	//  This sets the pre and post intracellular update functions
+	cell_defaults.functions.pre_update_intracellular =  pre_update_intracellular;
+	cell_defaults.functions.post_update_intracellular = post_update_intracellular;
+	cell_defaults.functions.update_phenotype = NULL; 
+	
+
+	build_cell_definitions_maps();
+	
+	setup_signal_behavior_dictionaries();
+
+	display_cell_definitions(std::cout);
+
+	return;
+}
+
+
 
 void create_cell_types(void)
 {
@@ -92,9 +117,7 @@ void create_cell_types(void)
 
 void setup_microenvironment(void)
 {
-
 	initialize_microenvironment();
-
 	return;
 }
 
@@ -118,6 +141,20 @@ void setup_tissue(void)
 	}	
 	return; 
 }
+
+void pre_update_intracellular(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double dt ){
+	PhysiCelldFBA::update_dfba_inputs( pCell, phenotype, dt );
+	PhysiCelldFBA::
+	return;
+}
+
+
+void post_update_intracellular(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double dt ){
+	PhysiCelldFBA::update_dfba_outputs( pCell, phenotype, dt );
+	return;
+}
+
+
 
 
 void update_cell(PhysiCell::Cell* pCell, PhysiCell::Phenotype& phenotype, double dt ){
