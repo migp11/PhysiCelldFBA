@@ -1,64 +1,59 @@
 /*
- * flux_balance_model.cpp
+ dFBAintracellular.cpp
  *
  *  Created on: 11 jun. 2019
  *      Author: mponce
  */
 
-#include "FBA_model.h"
+#include "dfba_Model.h"
 
 
-/* Default model used to initialize the initial cell */
-FBA_model FBA_default_model;
+/* Default dFBAModel used to initialize the initial cell */
+dFBAModel default_dFBAModel;
 
 
-FBA_model::FBA_model()
+dFBAModel::dFBAModel()
 {
-    this->id = "None";
+    this->id = "none";
     this->is_initialized = false;
     this->handler = NULL;
-    this->solution = NULL;
+    this->solution.status = "none";
 }
 
-FBA_model::~FBA_model() {
-    for(FBA_reaction* rxn: this->reactions)
-            delete rxn;
+dFBAModel::~dFBAModel() {
+    for(dFBAReaction* rxn: this->reactions)
+        delete rxn;
 
-        for(FBA_metabolite* met: this->metabolites)
-            delete met;
+        for(dFBAMetabolite* met: this->metabolites)
+        delete met;
 
     if (this->handler != NULL)
         delete handler;
-
-        if (this->solution != NULL)
-        delete solution;
-
 }
 
-const ClpSimplex* FBA_model::getLpModel() const
+const ClpSimplex* dFBAModel::getLpModel() const
 {
     return &this->problem;
 }
 
-const int FBA_model::getNumReactions()
+const int dFBAModel::getNumReactions()
 {
-
     return this->reactions.size();
 }
 
-const int FBA_model::getNumMetabolites()
+const int dFBAModel::getNumMetabolites()
 {
     return this->metabolites.size();
 }
 
-bool FBA_model::hasMetabolite(std::string mId)
+bool dFBAModel::hasMetabolite(std::string mId)
 {
     std::map<std::string, int>::iterator itr;
     itr = this->metaboliteIndexer.find(mId);
     return itr != this->metaboliteIndexer.end();
 }
 
-void FBA_model::addMetabolite(FBA_metabolite* met)
+void dFBAModel::addMetabolite(dFBAMetabolite* met)
 {
     if (!this->hasMetabolite( met->getId() ))
     {
@@ -68,7 +63,7 @@ void FBA_model::addMetabolite(FBA_metabolite* met)
 
 }
 
-const FBA_metabolite* FBA_model::getMetabolite(std::string mId)
+const dFBAMetabolite* dFBAModel::getMetabolite(std::string mId)
 {
     if (this->hasMetabolite(mId))
     {
@@ -78,12 +73,12 @@ const FBA_metabolite* FBA_model::getMetabolite(std::string mId)
     return nullptr;
 }
 
-const std::vector<FBA_metabolite*> FBA_model::getListOfMetabolites() const
+const std::vector<dFBAMetabolite*> dFBAModel::getListOfMetabolites() const
 {
     return this->metabolites;
 }
 
-bool FBA_model::hasReaction(std::string rId)
+bool dFBAModel::hasReaction(std::string rId)
 {
     std::map<std::string, int>::iterator it;
     it = this->reactionsIndexer.find(rId);
@@ -91,27 +86,27 @@ bool FBA_model::hasReaction(std::string rId)
     return it != this->reactionsIndexer.end();
 }
 
-FBA_reaction* FBA_model::getReaction(std::string rId)
+dFBAReaction* dFBAModel::getReaction(std::string rId)
 {
     if (this->hasReaction(rId))
     {
         int idx = this->reactionsIndexer[rId];
-        FBA_reaction* rxn = this->reactions[idx];
+        dFBAReaction* rxn = this->reactions[idx];
         return rxn;
     }
     return nullptr;
 }
 
 
-float FBA_model::getReactionUpperBound(std::string rId) 
+float dFBAModel::getReactionUpperBound(std::string rId) 
 {
-    FBA_reaction* rxn = this->getReaction(rId);
+    dFBAReaction* rxn = this->getReaction(rId);
     return rxn->getUpperBound();
 }
 
-void FBA_model::setReactionUpperBound(std::string rId, float upperBound)
+void dFBAModel::setReactionUpperBound(std::string rId, float upperBound)
 {
-    FBA_reaction* rxn = this->getReaction(rId);
+    dFBAReaction* rxn = this->getReaction(rId);
     if (rxn)
     {
         rxn->setUpperBound(upperBound);
@@ -120,15 +115,15 @@ void FBA_model::setReactionUpperBound(std::string rId, float upperBound)
     }
 }
 
-float FBA_model::getReactionLowerBound(std::string rId) 
+float dFBAModel::getReactionLowerBound(std::string rId) 
 {
-    FBA_reaction* rxn = this->getReaction(rId);
+    dFBAReaction* rxn = this->getReaction(rId);
     return rxn->getLowerBound();
 }
 
-void FBA_model::setReactionLowerBound(std::string rId, float lowerBound)
+void dFBAModel::setReactionLowerBound(std::string rId, float lowerBound)
 {
-    FBA_reaction* rxn = this->getReaction(rId);
+    dFBAReaction* rxn = this->getReaction(rId);
     if (rxn)
     {
         rxn->setLowerBound(lowerBound);
@@ -138,7 +133,7 @@ void FBA_model::setReactionLowerBound(std::string rId, float lowerBound)
 
 }
 
-void FBA_model::addReaction(FBA_reaction* rxn)
+void dFBAModel::addReaction(dFBAReaction* rxn)
 {
     if (!this->hasReaction( rxn->getId() ))
     {
@@ -147,7 +142,7 @@ void FBA_model::addReaction(FBA_reaction* rxn)
     }
 }
 
-const int FBA_model::getReactionIndex(std::string rId)
+const int dFBAModel::getReactionIndex(std::string rId)
 {
     if (this->hasReaction(rId))
         return this->reactionsIndexer[rId];
@@ -155,45 +150,45 @@ const int FBA_model::getReactionIndex(std::string rId)
         return -1;
 }
 
-const std::vector<FBA_reaction*> FBA_model::getListOfReactions() const
+const std::vector<dFBAReaction*> dFBAModel::getListOfReactions() const
 {
     return this->reactions;
 }
 
-std::vector<FBA_reaction*> FBA_model::getListOfBoundaryReactions()
+std::vector<dFBAReaction*> dFBAModel::getListOfBoundaryReactions()
 {
-    std::vector<FBA_reaction*> listOfBoundarys;
-    for(FBA_reaction* reaction: this->reactions)
+    std::vector<dFBAReaction*> listOfBoundarys;
+    for(dFBAReaction* dFBAReaction: this->reactions)
     {
-        if (reaction->getNumberOfMetabolites() == 1)
+        if (dFBAReaction->getNumberOfMetabolites() == 1)
         {
-            listOfBoundarys.push_back(reaction);        
+            listOfBoundarys.push_back(dFBAReaction);        
         }
     }
     return listOfBoundarys;
 }
 
-std::vector<std::string> FBA_model::getListOfBoundaryReactionIds()
+std::vector<std::string> dFBAModel::getListOfBoundaryReactionIds()
 {
     std::vector<std::string> listOfBoundaryIds;
-    for(FBA_reaction* reaction: this->reactions)
+    for(dFBAReaction* dFBAReaction: this->reactions)
     {
-        if (reaction->getNumberOfMetabolites() == 1)
+        if (dFBAReaction->getNumberOfMetabolites() == 1)
         {
-            listOfBoundaryIds.push_back(reaction->getId());
+            listOfBoundaryIds.push_back(dFBAReaction->getId());
         }
     }
     return listOfBoundaryIds;
 }
 
-void FBA_model::readSBMLModel(const char* sbmlFileName)
+void dFBAModel::readSBMLModel(const char* sbmlFileName)
 {
     SBMLReader reader;
     SBMLDocument* document = reader.readSBML(sbmlFileName);
     Model* model = document->getModel();
 
     ListOfSpecies* listOfSpecies = model->getListOfSpecies();
-    ListOfReactions* listOfFBA_reactions = model->getListOfReactions();
+    ListOfReactions* listOfReactions = model->getListOfReactions();
     ListOfParameters* listOfParameters = model->getListOfParameters();
 
     this->id = model->getId();
@@ -201,26 +196,26 @@ void FBA_model::readSBMLModel(const char* sbmlFileName)
     for (unsigned int i = 0; i < model->getNumSpecies(); i++)
     {
         Species* species = listOfSpecies->get(i);
-        // Skipping boundary metabolites
+        // Skipping boundary dFBAMetabolites
         if ( species->getBoundaryCondition() )
             continue;
 
-        FBA_metabolite* metabolite = new FBA_metabolite(species->getId());
+        dFBAMetabolite* metabolite = new dFBAMetabolite(species->getId());
         metabolite->setName(species->getName());
         this->addMetabolite(metabolite);
     }
 
     for(unsigned int i = 0; i < model->getNumReactions(); i++)
     {
-        Reaction* sbml_reaction = listOfFBA_reactions->get(i);
+        Reaction* sbml_reaction = listOfReactions->get(i);
 
-        FBA_reaction* reaction = new FBA_reaction(sbml_reaction->getId());
+        dFBAReaction* reaction = new dFBAReaction(sbml_reaction->getId());
         reaction->setName(sbml_reaction->getName());
 
         FbcReactionPlugin* rxnFbc = static_cast<FbcReactionPlugin*> (sbml_reaction->getPlugin("fbc"));
         if ( rxnFbc )
         {
-            // Getting reaction's upper and lower bounds
+            // Getting dFBAReaction's upper and lower bounds
             const std::string lbId = rxnFbc->getLowerFluxBound();
             double lb = listOfParameters->get(lbId)->getValue();
             reaction->setLowerBound(lb);
@@ -237,15 +232,16 @@ void FBA_model::readSBMLModel(const char* sbmlFileName)
 
             if ( !this->hasMetabolite(sbml_species->getSpecies()) )
             {
-                FBA_metabolite* metabolite = new FBA_metabolite(sbml_species->getSpecies());
+                dFBAMetabolite* metabolite = new dFBAMetabolite(sbml_species->getSpecies());
                 metabolite->setName(sbml_species->getName());
                 this->addMetabolite(metabolite);
             }
-            const FBA_metabolite* metabolite = this->getMetabolite(sbml_species->getSpecies());
+            
+            const dFBAMetabolite* metabolite = this->getMetabolite(sbml_species->getSpecies());
             if (metabolite != nullptr)
                 reaction->addMetabolite(metabolite, stoich_coef);
             else
-                std::cout << "ERROR: FBA_metabolite " << sbml_species->getSpecies() << " not found" << std::endl;
+                std::cout << "ERROR: dFBAMetabolite " << sbml_species->getSpecies() << " not found" << std::endl;
         }
 
         int numProducts = sbml_reaction->getNumProducts();
@@ -256,21 +252,21 @@ void FBA_model::readSBMLModel(const char* sbmlFileName)
 
             if ( !this->hasMetabolite(sbml_species->getSpecies()) )
             {
-                FBA_metabolite* metabolite = new FBA_metabolite(sbml_species->getSpecies());
+                dFBAMetabolite* metabolite = new dFBAMetabolite(sbml_species->getSpecies());
                 metabolite->setName(sbml_species->getName());
-                addMetabolite(metabolite);
+                this->addMetabolite(metabolite);
             }
-            const FBA_metabolite* metabolite = this->getMetabolite(sbml_species->getSpecies());
+            const dFBAMetabolite* metabolite = this->getMetabolite(sbml_species->getSpecies());
             if (metabolite != nullptr)
                 reaction->addMetabolite(metabolite, stoich_coef);
             else
-                std::cout << "ERROR: FBA_metabolite " << sbml_species->getSpecies() << " not found" << std::endl;
+                std::cout << "ERROR: dFBAMetabolite " << sbml_species->getSpecies() << " not found" << std::endl;
         }
         this->addReaction(reaction);
     }
 
     // The following code is intended to extract the objective function from the sbml using
-    // the FbcModelPlugin; then the coefficients are assigned to the corresponding reactions
+    // the FbcdFBAModelPlugin; then the coefficients are assigned to the corresponding dFBAReactions
     FbcModelPlugin* mplugin = static_cast<FbcModelPlugin*>(model->getPlugin("fbc"));
     ListOfObjectives* listOfObjectives =  mplugin->getListOfObjectives();
     Objective* objective =  mplugin->getObjective(listOfObjectives->getActiveObjective());
@@ -281,14 +277,14 @@ void FBA_model::readSBMLModel(const char* sbmlFileName)
         FluxObjective* fluxObjective = listOfFluxObjectives->get(i);
         std::string rId = fluxObjective->getReaction();
         double objectiveCoefficient = fluxObjective->getCoefficient();
-        FBA_reaction* reaction = this->getReaction(rId);
-        reaction->setObjectiveCoefficient(objectiveCoefficient);
+        dFBAReaction* dFBAReaction = this->getReaction(rId);
+        dFBAReaction->setObjectiveCoefficient(objectiveCoefficient);
     }
 
     delete document;
 }
 
-void FBA_model::initProblem()
+void dFBAModel::initProblem()
 {
 
     int n_rows = this->getNumMetabolites();
@@ -313,20 +309,20 @@ void FBA_model::initProblem()
         row_lb[i] = 0;
         row_ub[i] = 0;
     }
-    for(FBA_reaction* reaction: this->reactions)
+    for(dFBAReaction* rxn: this->reactions)
     {
-        int col_idx = this->reactionsIndexer[reaction->getId()];
-        col_lb[col_idx] = reaction->getLowerBound();
-        col_ub[col_idx] = reaction->getUpperBound();
-        objective[col_idx] = reaction->getObjectiveCoefficient();
+        int col_idx = this->reactionsIndexer[rxn->getId()];
+        col_lb[col_idx] = rxn->getLowerBound();
+        col_ub[col_idx] = rxn->getUpperBound();
+        objective[col_idx] = rxn->getObjectiveCoefficient();
 
-        const std::map<const FBA_metabolite*, double> metabolites = reaction->getMetabolites();
+        const std::map<const dFBAMetabolite*, double> metabolites = rxn->getMetabolites();
         CoinPackedVector col;
         for(auto it=metabolites.begin(); it!=metabolites.end(); it++)
         {
-            const FBA_metabolite* metabolite = it->first;
+            const dFBAMetabolite* met = it->first;
             double stoich_coeff = it->second;
-            int row_idx = this->metaboliteIndexer[metabolite->getId()];
+            int row_idx = this->metaboliteIndexer[met->getId()];
             col.insert(row_idx, stoich_coeff);
         }
         matrix.appendCol(col);
@@ -344,19 +340,18 @@ void FBA_model::initProblem()
     this->is_initialized = true;
 }
 
-void FBA_model::initModel(const char* sbmlFileName)
+void dFBAModel::initModel(const char* sbmlFileName)
 {
     this->readSBMLModel(sbmlFileName);
     this->initProblem();
-
 }
 
-void FBA_model::writeProblem(const char *filename)
+void dFBAModel::writeProblem(const char *filename)
 {
     this->problem.writeLp(filename);
 }
 
-FBA_solution* FBA_model::optimize()
+dFBASolution dFBAModel::optimize()
 {
     // std::cout << "Running FBA... ";
     
@@ -381,7 +376,7 @@ FBA_solution* FBA_model::optimize()
             status = "unknown";
         }
         
-        for(FBA_reaction* reaction: this->reactions)
+        for(dFBAReaction* reaction: this->reactions)
         {
             int column_idx = this->reactionsIndexer[reaction->getId()];
             double flux = columnPrimal[column_idx];
@@ -389,17 +384,19 @@ FBA_solution* FBA_model::optimize()
             reaction->setFluxValue(flux);
         }
 
-        this->solution = new FBA_solution(fopt, status, fluxes);
+        solution.objective_value = fopt;
+        solution.status = status;
+        solution.fluxes = fluxes;
     }
     else
     {
-        for(FBA_reaction* reaction: this->reactions)
+        for(dFBAReaction* reaction: this->reactions)
         { reaction->setFluxValue(0.0); }
     }
-    return this->solution;
+    return solution;
 }
 
-bool FBA_model::getSolutionStatus()
+bool dFBAModel::getSolutionStatus()
 {
     if (this->is_initialized)
         return this->problem.isProvenOptimal();
@@ -407,7 +404,7 @@ bool FBA_model::getSolutionStatus()
         return false;
 }
 
-float FBA_model::getObjectiveValue()
+float dFBAModel::getObjectiveValue()
 {
     assert(this->is_initialized);
     if (this->problem.isProvenOptimal())

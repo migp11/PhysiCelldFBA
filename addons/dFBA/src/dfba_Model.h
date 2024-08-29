@@ -20,14 +20,15 @@
 #include <coin/CoinPackedVector.hpp>
 #include <coin/ClpSimplex.hpp>
 
-
-#include "FBA_metabolite.h"
-#include "FBA_reaction.h"
-#include "FBA_solution.h"
+#include "dfba_Metabolite.h"
+#include "dfba_Reaction.h"
+#include "dfba_Solution.h"
 
 LIBSBML_CPP_NAMESPACE_USE
 
-class FBA_model
+
+
+class dFBAModel
 {
 	private:
 		/** \brief Constraint-Based Model Class to perform FBA*/
@@ -35,19 +36,19 @@ class FBA_model
 		std::string id;
 
 		/** \brief vector of reaction objects*/
-		std::vector<FBA_metabolite*> metabolites;
+		std::vector<dFBAMetabolite*> metabolites;
 
 		/** \brief map between metabolites' ids and metabolites' references **/
 		std::map<std::string, int> metaboliteIndexer;
 
 		/** \brief vector of reaction objects*/
-		std::vector<FBA_reaction*> reactions;
+		std::vector<dFBAReaction*> reactions;
 
 		/** \brief map between reaction IDs and reaction references */
 		std::map< std::string, int> reactionsIndexer;
 
 		/** \brief solution  */
-		FBA_solution* solution;
+		dFBASolution solution;
 
 		/** \brief Coin CLP simplex model to encode the FBA problem**/
 		ClpSimplex problem;
@@ -59,29 +60,29 @@ class FBA_model
 	public:
 
 		/** \brief Constructor */
-		FBA_model();
+		dFBAModel();
 
 		/** \brief Destructor */
-		~FBA_model();
+		~dFBAModel();
 
 		/** \brief Check if there is a metaboltie with a given ID*/
 		bool hasMetabolite(std::string mId);
 
 		/** \brief a metabolite pointer using a string Id*/
-		const FBA_metabolite* getMetabolite(std::string mId);
+		const dFBAMetabolite* getMetabolite(std::string mId);
 
 		/** \brief Add new metabolite to the model*/
-		void addMetabolite(FBA_metabolite* met);
+		void addMetabolite(dFBAMetabolite* met);
 
 		
 		/** \brief Check if there is a reaction with a given ID*/
 		bool hasReaction(std::string rId);
 		
 		/** \brief Get a reaction pointer using string ID*/
-		FBA_reaction* getReaction(std::string rId);
+		dFBAReaction* getReaction(std::string rId);
 
 		/** \brief Add new reaction to the model*/
-		void addReaction(FBA_reaction* rxn);
+		void addReaction(dFBAReaction* rxn);
 
 		/** \brief Get the integer index of a reaction*/
 		const int getReactionIndex(std::string rId);
@@ -105,13 +106,13 @@ class FBA_model
 		const int getNumMetabolites();
 
 		/** \brief Get a metabolite pointer using s string Id*/
-		const std::vector<FBA_metabolite*> getListOfMetabolites() const;
+		const std::vector<dFBAMetabolite*> getListOfMetabolites() const;
 
 		/** \brief Get the list of reaction pointers*/
-		const std::vector<FBA_reaction*> getListOfReactions() const;
+		const std::vector<dFBAReaction*> getListOfReactions() const;
 
 			/** \brief Get the list of reaction pointers*/
-		std::vector<FBA_reaction*> getListOfBoundaryReactions();
+		std::vector<dFBAReaction*> getListOfBoundaryReactions();
 
 		/** \brief Get the list of IDs of the boundary reactions*/
 		std::vector<std::string> getListOfBoundaryReactionIds();
@@ -132,7 +133,7 @@ class FBA_model
 		void writeProblem(const char *filename);
 
 		/** \brief Run FBA using primal method */
-		FBA_solution* optimize();
+		dFBASolution optimize();
 
 		/** \brief Get solution status */
 		std::string getId() { return this->id; };
@@ -143,7 +144,7 @@ class FBA_model
 		/** \brief Get objective value */
 		float getObjectiveValue();
 
-		FBA_solution* getSolution(){ return this->solution; }
+		dFBASolution getSolution(){ return this->solution; }
 };
 
 

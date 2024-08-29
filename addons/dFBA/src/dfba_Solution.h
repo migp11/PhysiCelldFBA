@@ -1,5 +1,5 @@
 /*
- * Reaction.h
+ * dfba_Reaction.h
  *
  *  Created on: jun. 2022
  *      Author: mponce
@@ -13,19 +13,22 @@
 #include <vector>
 
 
-class FBA_solution
+class dFBASolution
 {
 	private:
 	    /** \brief Constraint-Based Model Class that contains a solution*/
+
+
+    public:
+
         float objective_value;
         std::string status;
         std::map<std::string, float> fluxes;
         std::map<std::string, float> reduced_costs;
 
-    public:
-        FBA_solution();
-        FBA_solution(float objective_value, std::string status, std::map<std::string,float> fluxes);
-        ~FBA_solution();
+        dFBASolution();
+        dFBASolution(float objective_value, std::string status, std::map<std::string,float> fluxes);
+        ~dFBASolution();
 
         float getObjectiveValue(){ return this->objective_value; }
         std::string getStatus(){ return this->status; };
