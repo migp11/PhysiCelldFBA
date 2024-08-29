@@ -113,7 +113,7 @@ FBA_addon_OBJECTS := FBA_metabolite.o FBA_reaction.o FBA_model.o
 
 # put your custom objects here (they should be in the custom_modules directory)
 
-PhysiCell_custom_module_OBJECTS := ecoli_acetic_switch.o
+PhysiCell_custom_module_OBJECTS := custom.o
 
 pugixml_OBJECTS := pugixml.o
 
@@ -234,18 +234,24 @@ else
 	python3 beta/setup_coin_clp.py
 endif
 
-FBA_model.o: ./addons/dFBA/FBA_model.cpp
-	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ./addons/dFBA/FBA_model.cpp -o ./FBA_model.o
-	#export LD_LIBRARY_PATH=$LD_LIBRARY_PATH:addons/coin-clp/lib
+dfba_intracellular.o: addons/dFBA/src/dfba_intracellular.cpp
+	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c addons/dFBA/src/dfba_intracellular.cpp -o ./dfba_intracellular.o
 
-FBA_reaction.o: ./addons/dFBA/FBA_reaction.cpp
-	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ./addons/dFBA/FBA_reaction.cpp -o ./FBA_reaction.o
+dfba_Model.o: addons/dFBA/src/dfba_Model.cpp
+	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c addons/dFBA/src/dfba_Model.cpp -o ./dfba_Model.o
 
-FBA_metabolite.o: ./addons/dFBA/FBA_metabolite.cpp
-	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ./addons/dFBA/FBA_metabolite.cpp -o ./FBA_metabolite.o
+dfba_Reaction.o: addons/dFBA/src/dfba_Reaction.cpp
+	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c addons/dFBA/src/dfba_Reaction.cpp -o ./dfba_Reaction.o
 
-ecoli_acetic_switch.o: ./custom_modules/ecoli_acetic_switch.cpp
-	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c ./custom_modules/ecoli_acetic_switch.cpp
+dfba_Metabolite.o: addons/dFBA/src/dfba_Metabolite.cpp
+	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c addons/dFBA/src/dfba_Metabolite.cpp -o ./dfba_Metabolite.o
+
+dfba_Solution.o: addons/dFBA/src/dfba_Solution.cpp
+	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c addons/dFBA/src/dfba_Solution.cpp -o ./dfba_Solution.o
+
+# user-defined PhysiCell modules
+custom.o: ./custom_modules/custom.cpp
+	$(COMPILE_COMMAND) -c ./custom_modules/custom.cpp
 
 
 # cleanup
