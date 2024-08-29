@@ -1,7 +1,7 @@
 #include <iostream>
 #include <vector>
 
-#include "../src/FBA_model.h"
+#include "../src/dfba_Model.h"
 
 using namespace std;
 
@@ -15,21 +15,21 @@ int main (int argc, const char *argv[])
     }
     const char *sbml_fileame = argv[1];
 
-    FBA_model *model = new FBA_model();
+    dFBAModel *model = new dFBAModel();
     std::cout << "Reading SBML model from: " << sbml_fileame << " ";
     model->readSBMLModel(sbml_fileame);
     std::cout << "Ok!" << std::endl;
     std::cout << "Model " << model->getId() << "has been correctly loaded" << std::endl;
     std::cout << "Initializing LP model: ";
-    model->initLpModel();
+    model->initProblem();
     std::cout << "Ok!" << std::endl;
 
     std::cout << "Testing FBA: ";
-    FBA_solution* solution = model->optimize();
-    if ( solution->status == 'optima'){
+    dFBASolution solution = model->optimize();
+    if ( solution.status == "optimal"){
         std::cout << "OPTIMAL SOLUTION FOUND" << std::endl;
-        FBA_solution* solution = model->getSolution();
-        float fopt = solution->getObjectiveValue();
+        solution = model->getSolution();
+        float fopt = solution.getObjectiveValue();
 	    std::cout << "Objective value: " << fopt << std::endl;   
     }
 
