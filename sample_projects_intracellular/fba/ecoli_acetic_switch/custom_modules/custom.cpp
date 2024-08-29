@@ -94,26 +94,6 @@ void create_cell_types(void)
 
 
 
-void create_cell_types(void)
-{
-
-	SeedRandom(parameters.ints("random_seed"));
-
-	initialize_default_cell_definition();
-
-	/*  This parses the cell definitions in the XML config file.  */
-
-	initialize_cell_definitions_from_pugixml();
-
-	cell_defaults.functions.update_phenotype = NULL;
-
-	// Needs to initialize one of the receptor state to the total receptor value
-
-	build_cell_definitions_maps();
-	display_cell_definitions(std::cout);
-
-	return;
-}
 
 void setup_microenvironment(void)
 {
