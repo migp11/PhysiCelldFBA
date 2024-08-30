@@ -33,7 +33,7 @@
 #                                                                             #
 # BSD 3-Clause License (see https://opensource.org/licenses/BSD-3-Clause)     #
 #                                                                             #
-# Copyright (c) 2015-2018, Paul Macklin and the PhysiCell Project             #
+# Copyright (c) 2015-2021, Paul Macklin and the PhysiCell Project             #
 # All rights reserved.                                                        #
 #                                                                             #
 # Redistribution and use in source and binary forms, with or without          #
@@ -77,10 +77,9 @@
 #include "./core/PhysiCell.h"
 #include "./modules/PhysiCell_standard_modules.h" 
 
-
-
 // custom user modules 
-#include "custom_modules/cancer_metabolism.h"
+
+#include "./custom_modules/heterogeneity.h" 
 	
 using namespace BioFVM;
 using namespace PhysiCell;
@@ -214,24 +213,8 @@ int main( int argc, char* argv[] )
 					PhysiCell_globals.SVG_output_index++; 
 					PhysiCell_globals.next_SVG_save_time  += PhysiCell_settings.SVG_save_interval;
 				}
-				
-				// std::cout << "Total substrates " << integrate_total_substrates() << std::endl; 
 			}
-
-			// update the microenvironment
-			// microenvironment.simulate_diffusion_decay( diffusion_dt );
 			
-			// run PhysiCell 
-			((Cell_Container *)microenvironment.agent_container)->update_all_cells( PhysiCell_globals.current_time );
-			
-			/*
-			  Custom add-ons could potentially go here. 
-			*/
-			for(int n=0; n < all_cells->size(); n++)
-			  {
-			    PhysiCell::Cell* pCell = (*all_cells)[n];
-			    update_cell(pCell, pCell->phenotype, diffusion_dt);
-			  }
 			// update the microenvironment
 			microenvironment.simulate_diffusion_decay( diffusion_dt );
 			
@@ -267,8 +250,3 @@ int main( int argc, char* argv[] )
 
 	return 0; 
 }
-
-
-
-
-

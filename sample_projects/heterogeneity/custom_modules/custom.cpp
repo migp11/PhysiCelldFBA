@@ -206,6 +206,9 @@ void setup_tissue( void )
 	
 	Cell* pCell = NULL; 
 	
+	std::vector<std::vector<double>> positions = create_cell_sphere_positions(cell_radius,tumor_radius);
+	std::cout << "creating " << positions.size() << " closely-packed tumor cells ... " << std::endl;
+
 	double x = 0.0; 
 	double x_outer = tumor_radius; 
 	double y = 0.0; 

@@ -217,8 +217,9 @@ int main( int argc, char* argv[] )
 			/*
 			  Custom add-ons could potentially go here. 
 			*/
-			#pragma omp parallel for
-			for(int n=0; n < all_cells->size(); n++)
+			
+			if( fabs( PhysiCell_globals.current_time - next_dFBA_time ) < 0.01 * diffusion_dt ){
+				for(int n=0; n < all_cells->size(); n++)
 			  {
 			    PhysiCell::Cell* pCell = (*all_cells)[n];
 			    update_cell(pCell, pCell->phenotype, diffusion_dt);

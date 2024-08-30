@@ -83,18 +83,13 @@
 		<dx>20</dx>
 		<dy>20</dy>
 		<dz>20</dz>
-		<use_2D>false</use_2D>
+		<use_2D>true</use_2D>
 	</domain>
-	
 	
 	<overall>
 		<max_time units="min">480</max_time> <!-- 8640 -->
 		<time_units>min</time_units>
 		<space_units>micron</space_units>
-	
-		<dt_diffusion units="min">0.01</dt_diffusion>
-		<dt_mechanics units="min">0.1</dt_mechanics>
-		<dt_phenotype units="min">6</dt_phenotype>	
 	
 		<dt_diffusion units="min">0.01</dt_diffusion>
 		<dt_mechanics units="min">0.1</dt_mechanics>
@@ -118,7 +113,7 @@
 		</full_data>
 		
 		<SVG>
-			<interval units="min">60</interval>
+			<interval units="min">30</interval>
 			<enable>true</enable>
 		</SVG>
 		
@@ -127,10 +122,6 @@
 		</legacy_data>
 	</save>
 	
-	<options>
-		<legacy_random_points_on_sphere_in_divide>false</legacy_random_points_on_sphere_in_divide>
-	</options>	
-
 	<microenvironment_setup>
 		<variable name="oxygen" units="dimensionless" ID="0">
 			<physical_parameter_set>
@@ -152,7 +143,6 @@
 
 		<options>
 			<calculate_gradients>true</calculate_gradients>
-			<track_internalized_substrates_in_each_agent>true</track_internalized_substrates_in_each_agent>
 			<track_internalized_substrates_in_each_agent>true</track_internalized_substrates_in_each_agent>
 			<!-- not yet supported --> 
 			<initial_condition type="matlab" enabled="false">
@@ -215,6 +205,5 @@
 		<random_seed type="int" units="dimensionless">0</random_seed> 
 		<tumor_radius type="double" units="microns">200</tumor_radius> 
 	</user_parameters>
-	
 	
 </PhysiCell_settings>

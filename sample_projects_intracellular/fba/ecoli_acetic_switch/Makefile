@@ -174,11 +174,8 @@ PhysiCell_settings.o: ./modules/PhysiCell_settings.cpp
 
 # PhysiFBA addon modules
 libFBA: 
-ifeq ($(OS), Windows_NT)
-	python beta/setup_coin_clp.py
-else
-	python3 beta/setup_coin_clp.py
-endif
+	python3 ../../../beta/setup_fba.py --pkg libsbml --arch $(PKG_ARCH)
+	python3 ../../../beta/setup_fba.py --pkg coin-or --arch $(PKG_ARCH)
 
 dfba_intracellular.o: addons/dFBA/src/dfba_intracellular.cpp
 	$(COMPILE_COMMAND) $(ADDFLAGS) $(INC) $(LIBS) -c addons/dFBA/src/dfba_intracellular.cpp -o ./dfba_intracellular.o
