@@ -1,9 +1,3 @@
-.cproject
-.project
-.settings/
-.vscode/*
-*.o
-*.exe
 .DS_Store
 Makefile-backup
 config/PhysiCell_settings-backup.xml
@@ -52,4 +46,3 @@ addons/PhysiBoSS/libMaBoSS-*.tar.gz
 user_projects/*
 !user_projects/empty.txt
 
-addons/dFBA/ext/*
