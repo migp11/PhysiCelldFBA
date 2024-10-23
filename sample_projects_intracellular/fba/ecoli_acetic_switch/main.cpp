@@ -150,19 +150,22 @@ int main( int argc, char* argv[] )
 	// for simplicity, set a pathology coloring function 
 	
 	std::vector<std::string> (*cell_coloring_function)(Cell*) = my_coloring_function; 
-	
+	std::cout << "BEFORE" << std::endl;
 	sprintf( filename , "%s/initial.svg" , PhysiCell_settings.folder.c_str() ); 
 	SVG_plot( filename , microenvironment, 0.0 , PhysiCell_globals.current_time, cell_coloring_function );
 	
 	sprintf( filename , "%s/legend.svg" , PhysiCell_settings.folder.c_str() ); 
-	create_plot_legend( filename , cell_coloring_function ); 
+	//create_plot_legend( filename , cell_coloring_function ); 
+	std::cout << "IN BETWEEN" << std::endl;
 	
 	display_citations(); 
 	
 	// set the performance timers 
 
 	BioFVM::RUNTIME_TIC();
+
 	BioFVM::TIC();
+	std::cout << "AFTER" << std::endl;
 	
 	std::ofstream report_file;
 	if( PhysiCell_settings.enable_legacy_saves == true )
@@ -172,7 +175,7 @@ int main( int argc, char* argv[] )
 		report_file.open(filename); 	// create the data log file 
 		report_file<<"simulated time\tnum cells\tnum division\tnum death\twall time"<<std::endl;
 	}
-	
+	std::cout << "JUST BEFORE MAIN LOOP" << std::endl;
 	// main loop 
 	
 	try 
